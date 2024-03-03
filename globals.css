@@ -1,0 +1,45 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bark: #341109;
+  --oatmeal: #f3d6af;
+}
+
+body {
+  color: var(--bark);
+  background: var(--oatmeal);
+}
+
+::-moz-selection {
+  /* Code for Firefox */
+  color: var(--oatmeal);
+  background: var(--bark);
+}
+
+::selection {
+  color: var(--oatmeal);
+  background: var(--bark);
+}
+
+/* Text styles */
+
+.font-soehne {
+  font-family: var(--font-soehne);
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--font-tobias);
+}
+
+p {
+  font-family: var(--font-soehne);
+}
+
+/* HELPERS */
+.text-pretty {
+  text-wrap: pretty;
+}
