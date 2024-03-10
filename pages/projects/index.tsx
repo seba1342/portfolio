@@ -1,3 +1,5 @@
+import { Mono } from "@/components/text/Mono";
+import { Titles } from "@/components/text/Titles";
 import { type Project, getAllProjectIds, getProjectData } from "@/lib/projects";
 import type { InferGetStaticPropsType } from "next";
 import Link from "next/link";
@@ -45,10 +47,10 @@ function Project({
           !isFirst ? "pt-12" : ""
         }`}
       >
-        <h1 className="text-8xl">{project.title}</h1>
-        <p className="font-mono text-base">
+        <Titles.H1>{project.title}</Titles.H1>
+        <Mono.Body>
           {project.type} • {project.date}
-        </p>
+        </Mono.Body>
       </div>
       {!isLast && <div className="w-[110%] h-[1px] -ml-6 bg-bark" />}
     </Link>

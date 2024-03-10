@@ -1,7 +1,9 @@
+import { Titles } from "@/components/text/Titles";
 import { Project, getAllProjectIds, getProjectData } from "../../lib/projects";
 import { GetStaticPaths, GetStaticProps, InferGetStaticPropsType } from "next";
 import { ComponentProps } from "react";
 import Markdown from "react-markdown";
+import { Mono } from "@/components/text/Mono";
 
 type Props = { project: Project };
 
@@ -36,10 +38,10 @@ export default function Page({
 
   return (
     <div className="w-full text-left">
-      <h1 className="text-8xl mb-4">{project.title}</h1>
-      <p className="font-mono text-base mb-8">
+      <Titles.H1 className="mb-4">{project.title}</Titles.H1>
+      <Mono.Body className="font-mono text-base mb-8">
         {project.type} • {project.date}
-      </p>
+      </Mono.Body>
       <Markdown
         className="font-sans text-2xl max-w-6xl leading-normal"
         components={components}

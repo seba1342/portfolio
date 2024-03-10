@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { Mono } from "../text/Mono";
 
 export default function Header() {
   const pathname = usePathname();
@@ -9,7 +10,7 @@ export default function Header() {
         <h1 className="font-sans text-2xl">
           <Link href="/">Sebastien Bailouni</Link>
         </h1>
-        <ul className="font-mono text-1xl flex flex-row">
+        <ul className="flex flex-row justify-center items-center">
           <li className="px-4">
             <Link
               className={
@@ -17,7 +18,7 @@ export default function Header() {
               }
               href="/projects"
             >
-              Projects
+              <Mono.Body className="mb-0">Projects</Mono.Body>
             </Link>
           </li>
           {/* <li className="px-4">
