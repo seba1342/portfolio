@@ -43,7 +43,7 @@ function Project({
   return (
     <Link href={`/projects/${project.id}`}>
       <div
-        className={`h-2/3 flex flex-1 w-[calc(110%)] flex-col justify-between pb-8 ${
+        className={`h-2/3 flex flex-1 w-full flex-col justify-between pb-8 ${
           !isFirst ? "pt-12" : ""
         }`}
       >
@@ -52,7 +52,9 @@ function Project({
           {project.type} • {project.date}
         </Mono.Body>
       </div>
-      {!isLast && <div className="w-[110%] h-[1px] -ml-6 bg-bark" />}
+      {!isLast && (
+        <div className="w-[calc(100%+3rem)] h-[1px] -ml-[1.5rem] bg-bark" />
+      )}
     </Link>
   );
 }

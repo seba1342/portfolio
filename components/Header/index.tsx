@@ -13,24 +13,12 @@ export default function Header() {
         <ul className="flex flex-row justify-center items-center">
           <li className="px-4">
             <Link
-              className={
-                pathname.includes("projects") ? `underline` : undefined
-              }
+              className={pathname.includes("projects") ? `underline` : ""}
               href="/projects"
             >
               <Mono.Body className="mb-0">Projects</Mono.Body>
             </Link>
           </li>
-          {/* <li className="px-4">
-          <Link
-            className={
-              pathname.includes("inspiration") ? `underline` : undefined
-            }
-            href="/inspiration"
-          >
-            Inspiration
-          </Link>
-        </li> */}
         </ul>
       </div>
       <div className="h-8 w-full bg-gradient-to-t from-transparent to-oatmeal" />

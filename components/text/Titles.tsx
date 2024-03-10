@@ -3,7 +3,7 @@ import { TextProps } from "./types";
 
 export const Titles = { H1, H2 };
 
-function H1({ children, className }: TextProps) {
+function H1({ children, className = "" }: TextProps) {
   return (
     <h1
       className={`text-pretty font-serif leading-relaxed mb-12 text-6xl xl:text-8xl ${className}`}
