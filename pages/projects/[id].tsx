@@ -25,9 +25,21 @@ export const getStaticProps: GetStaticProps<Props> = async ({ params }) => {
 };
 
 const components = {
-  // // Override the rendering of images to remove the <p> tag
-  // img: ({ src, alt }) => <Image src={src} alt={alt} width={600} height={800} />,
+  h1: (props) => (
+    <Titles.H1 className={`${props.className} pb-4`}>
+      {props.children}
+    </Titles.H1>
+  ),
+  h2: (props) => (
+    <Titles.H2 className={`${props.className} mt-8`}>
+      {props.children}
+    </Titles.H2>
+  ),
   p: (props) => <p {...props} className={`${props.className} pb-4`} />,
+  a: (props) => <a {...props} className={`${props.className} underline`} />,
+  ul: (props) => (
+    <ul {...props} className={`${props.className} list-disc list-inside`} />
+  ),
 } satisfies ComponentProps<typeof Markdown>["components"];
 
 export default function Page({

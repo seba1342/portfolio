@@ -1,3 +1,5 @@
+import Body from "@/components/text/Body";
+import { Titles } from "@/components/text/Titles";
 import { shuffleArray } from "@/lib/helpers";
 import type { InferGetStaticPropsType } from "next";
 import Image from "next/image";
@@ -25,10 +27,17 @@ export default function Inspiration({
   allInspiration,
 }: InferGetStaticPropsType<typeof getStaticProps>) {
   return (
-    <div className="flex flex-wrap justify-center">
-      {allInspiration.map((inspiration) => (
-        <InspirationItem key={inspiration.id} inspiration={inspiration} />
-      ))}
+    <div>
+      <Titles.H1>Inspiration</Titles.H1>
+      <Body>
+        This is a collection of inspiration I have found on the internet. It is
+        a mixture of websites, funny videos and art.
+      </Body>
+      <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 mt-12">
+        {allInspiration.map((inspiration) => (
+          <InspirationItem key={inspiration.id} inspiration={inspiration} />
+        ))}
+      </div>
     </div>
   );
 }
@@ -43,9 +52,13 @@ function InspirationItem({ inspiration }: { inspiration: Inspiration }) {
     return;
 
   return (
-    <Link className="border-bark border-8 m-2" href={inspiration.source.url}>
+    <Link
+      className="relative aspect-w-1 aspect-h-1"
+      href={inspiration.source.url}
+    >
       <Image
         alt={`Image of ${inspiration.title}`}
+        className="w-full h-full object-contain"
         src={inspiration.image.square.url}
         width={440}
         height={440}
