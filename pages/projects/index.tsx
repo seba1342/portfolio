@@ -1,6 +1,6 @@
 import { Mono } from "@/components/text/Mono";
 import { Titles } from "@/components/text/Titles";
-import { type Project, getAllProjectIds, getProjectData } from "@/lib/projects";
+import { getAllProjectIds, getProjectData, type Project } from "@/lib/projects";
 import type { InferGetStaticPropsType } from "next";
 import Link from "next/link";
 
@@ -43,9 +43,9 @@ function Project({
   return (
     <Link href={`/projects/${project.id}`}>
       <div
-        className={`h-2/3 flex flex-1 w-full flex-col justify-between pb-8 ${
+        className={`flex flex-1 w-full flex-col justify-between pb-8 relative overflow-hidden ${
           !isFirst ? "pt-12" : ""
-        }`}
+        } hover:py-24 transition-all duration-300`}
       >
         <Titles.H1>{project.title}</Titles.H1>
         <Mono.Body>
