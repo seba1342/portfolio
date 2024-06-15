@@ -59,7 +59,7 @@ function InspirationItem({ inspiration }: { inspiration: Inspiration }) {
     >
       <Image
         alt={`Image of ${inspiration.title}`}
-        className="w-full h-full object-contain"
+        className="w-full h-full object-contain bg-softBark"
         height={440}
         src={inspiration.image.square.url}
         width={440}
