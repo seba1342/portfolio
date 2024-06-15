@@ -1,4 +1,5 @@
 import * as React from "react";
+
 import { TextProps } from "./types";
 
 export const Mono = { Body };

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+
 import { Mono } from "../text/Mono";
 
 export default function Header() {

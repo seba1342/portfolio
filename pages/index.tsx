@@ -1,6 +1,7 @@
+import type { InferGetStaticPropsType } from "next";
+
 import { Titles } from "@/components/text/Titles";
 import { getAllProjectIds } from "@/lib/projects";
-import type { InferGetStaticPropsType } from "next";
 
 export async function getStaticProps() {
   const allProjects = getAllProjectIds();

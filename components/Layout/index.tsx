@@ -1,23 +1,25 @@
 import type { Metadata } from "next";
-import Head from "next/head";
+
 import localFont from "next/font/local";
+import Head from "next/head";
+
 import Header from "../Header";
 
 export const tobias = localFont({
-  src: "./fonts/Tobias-Thin.woff2",
   display: "swap",
+  src: "./fonts/Tobias-Thin.woff2",
   variable: "--font-tobias",
 });
 
 export const soehne = localFont({
-  src: "./fonts/Soehne-Book.woff2",
   display: "swap",
+  src: "./fonts/Soehne-Book.woff2",
   variable: "--font-soehne",
 });
 
 export const metadata: Metadata = {
-  title: "Sebastien Bailouni",
   description: "Portfolio",
+  title: "Sebastien Bailouni",
 };
 
 export default function RootLayout({
@@ -28,9 +30,9 @@ export default function RootLayout({
   return (
     <div className={`${tobias.variable} ${soehne.variable}`}>
       <Head>
-        <link rel="icon" href="/favicon.ico" />
-        <meta name="description" content="Portfolio" />
-        <meta name="og:title" content="Sebastien Bailouni" />
+        <link href="/favicon.ico" rel="icon" />
+        <meta content="Portfolio" name="description" />
+        <meta content="Sebastien Bailouni" name="og:title" />
       </Head>
       <Header />
       <main className="flex justify-center text-pretty pt-[calc(113px)]">

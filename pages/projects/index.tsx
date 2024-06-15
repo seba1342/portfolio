@@ -1,8 +1,12 @@
+import type { InferGetStaticPropsType } from "next";
+
 import { Mono } from "@/components/text/Mono";
 import { Titles } from "@/components/text/Titles";
-import { getAllProjectIds, getProjectData, type Project } from "@/lib/projects";
-import type { InferGetStaticPropsType } from "next";
+import { type Project, getAllProjectIds, getProjectData } from "@/lib/projects";
 import Link from "next/link";
+import { useState } from "react";
+
+import HiFiSVG from "./svg/HiFiSVG";
 
 export async function getStaticProps() {
   const allProjectIds = getAllProjectIds();
@@ -38,10 +42,15 @@ function Project({
   isLast: boolean;
   project: Project;
 }) {
+  const [isHovered, setIsHovered] = useState(false);
   if (project == null) return;
 
   return (
-    <Link href={`/projects/${project.id}`}>
+    <Link
+      href={`/projects/${project.id}`}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
       <div
         className={`flex flex-1 w-full flex-col justify-between pb-8 relative overflow-hidden ${
           !isFirst ? "pt-12" : ""
@@ -51,6 +60,11 @@ function Project({
         <Mono.Body>
           {project.type} • {project.date}
         </Mono.Body>
+        <HiFiSVG
+          className={`absolute right-0 top-0 fill-bark scale-50 origin-top-right pt-24 ${
+            isHovered ? "opacity-100 translate-y-0" : "opacity-0 translate-y-5"
+          } transition-all duration-500`}
+        />
       </div>
       {!isLast && (
         <div className="w-[calc(100%+3rem)] h-[1px] -ml-[1.5rem] bg-bark" />

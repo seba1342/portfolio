@@ -1,6 +1,6 @@
 import fs from "fs";
+import matter from "gray-matter";
 import path from "path";
-import matter, { type GrayMatterFile } from "gray-matter";
 
 const projectsDirectory = path.join(process.cwd(), "projects");
 
@@ -11,10 +11,10 @@ export function getAllProjectIds(): Array<string> {
 }
 
 export type Project = {
-  id: string | string[];
   content: string;
-  title: string;
   date: string;
+  id: string | string[];
+  title: string;
   type: string;
 } | null;
 
@@ -29,8 +29,8 @@ export function getProjectData(id: string | string[] | undefined): Project {
 
   // Combine the data with the id
   return {
-    id,
     content: matterResult.content,
+    id,
     ...matterResult.data,
   } as Project;
 }

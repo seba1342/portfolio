@@ -1,17 +1,18 @@
+import { Mono } from "@/components/text/Mono";
 import { Titles } from "@/components/text/Titles";
-import { Project, getAllProjectIds, getProjectData } from "../../lib/projects";
 import { GetStaticPaths, GetStaticProps, InferGetStaticPropsType } from "next";
 import { ComponentProps } from "react";
 import Markdown from "react-markdown";
-import { Mono } from "@/components/text/Mono";
+
+import { Project, getAllProjectIds, getProjectData } from "../../lib/projects";
 
 type Props = { project: Project };
 
 export const getStaticPaths: GetStaticPaths = () => {
   const paths = getAllProjectIds().map((id) => ({ params: { id } }));
   return {
-    paths,
     fallback: false,
+    paths,
   };
 };
 
@@ -25,6 +26,7 @@ export const getStaticProps: GetStaticProps<Props> = async ({ params }) => {
 };
 
 const components = {
+  a: (props) => <a {...props} className={`${props.className} underline`} />,
   h1: (props) => (
     <Titles.H1 className={`${props.className} pb-4`}>
       {props.children}
@@ -36,7 +38,6 @@ const components = {
     </Titles.H2>
   ),
   p: (props) => <p {...props} className={`${props.className} pb-4`} />,
-  a: (props) => <a {...props} className={`${props.className} underline`} />,
   ul: (props) => (
     <ul {...props} className={`${props.className} list-disc list-inside`} />
   ),
@@ -47,6 +48,8 @@ export default function Page({
 }: InferGetStaticPropsType<typeof getStaticProps>) {
   // if project is null redirect to 404?
   if (project == null) return null;
+
+  const hey = "hey";
 
   return (
     <div className="w-full text-left">

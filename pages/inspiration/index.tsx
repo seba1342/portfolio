@@ -1,17 +1,18 @@
+import type { InferGetStaticPropsType } from "next";
+
 import Body from "@/components/text/Body";
 import { Titles } from "@/components/text/Titles";
 import { shuffleArray } from "@/lib/helpers";
-import type { InferGetStaticPropsType } from "next";
 import Image from "next/image";
 import Link from "next/link";
 
 type Inspiration = {
-  title: string;
   base_class: string;
   created_at: string;
-  source?: { url: string };
-  image?: { thumb: { url: string }; square: { url: string } };
   id: number;
+  image?: { square: { url: string }; thumb: { url: string } };
+  source?: { url: string };
+  title: string;
 };
 
 export async function getStaticProps() {
@@ -35,7 +36,7 @@ export default function Inspiration({
       </Body>
       <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 mt-12">
         {allInspiration.map((inspiration) => (
-          <InspirationItem key={inspiration.id} inspiration={inspiration} />
+          <InspirationItem inspiration={inspiration} key={inspiration.id} />
         ))}
       </div>
     </div>
@@ -59,9 +60,9 @@ function InspirationItem({ inspiration }: { inspiration: Inspiration }) {
       <Image
         alt={`Image of ${inspiration.title}`}
         className="w-full h-full object-contain"
+        height={440}
         src={inspiration.image.square.url}
         width={440}
-        height={440}
       />
     </Link>
   );
