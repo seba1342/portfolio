@@ -7,7 +7,7 @@ import Header from "../Header";
 
 export const tobias = localFont({
   display: "swap",
-  src: "./fonts/Tobias-Thin.woff2",
+  src: "./fonts/Tobias-Light.woff2",
   variable: "--font-tobias",
 });
 
@@ -28,16 +28,19 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className={`${tobias.variable} ${soehne.variable}`}>
+    <div
+      className={`${tobias.variable} ${soehne.variable} pb-24 min-h-[100vh]`}
+    >
       <Head>
         <link href="/favicon.ico" rel="icon" />
         <meta content="Portfolio" name="description" />
         <meta content="Sebastien Bailouni" name="og:title" />
       </Head>
       <Header />
-      <main className="flex justify-center text-pretty pt-[calc(113px)]">
-        {/* 113px is the height of the header */}
-        <div className="h-[calc(100vh-113px)] px-6 flex-1">{children}</div>
+      <main
+        className={`flex flex-col justify-center text-pretty px-2 md:px-6 flex-1 pt-[80px]`}
+      >
+        {children}
       </main>
     </div>
   );

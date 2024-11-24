@@ -2,6 +2,8 @@
 @tailwind components;
 @tailwind utilities;
 
+@import url("components/text/text.css");
+
 :root {
   --bark: #341109;
   --soft-bark: #341109a8;
@@ -22,25 +24,4 @@ body {
 ::selection {
   color: var(--oatmeal);
   background: var(--bark);
-}
-
-/* Text styles */
-
-.font-soehne {
-  font-family: var(--font-soehne);
-}
-
-h1,
-h2,
-h3 {
-  font-family: var(--font-tobias);
-}
-
-p {
-  font-family: var(--font-soehne);
-}
-
-/* HELPERS */
-.text-pretty {
-  text-wrap: pretty;
 }

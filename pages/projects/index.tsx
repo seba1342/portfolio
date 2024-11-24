@@ -1,7 +1,6 @@
 import type { InferGetStaticPropsType } from "next";
 
-import { Mono } from "@/components/text/Mono";
-import { Titles } from "@/components/text/Titles";
+import { Body, Titles } from "@/components/text";
 import { type Project, getAllProjectIds, getProjectData } from "@/lib/projects";
 import Link from "next/link";
 import { useState } from "react";
@@ -57,9 +56,9 @@ function Project({
         } hover:py-24 transition-all duration-300`}
       >
         <Titles.H1>{project.title}</Titles.H1>
-        <Mono.Body>
+        <Body.Small>
           {project.type} • {project.date}
-        </Mono.Body>
+        </Body.Small>
         <HiFiSVG
           className={`absolute right-0 top-0 fill-bark scale-50 origin-top-right pt-24 ${
             isHovered ? "opacity-100 translate-y-0" : "opacity-0 translate-y-5"
