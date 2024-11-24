@@ -1,5 +1,7 @@
-// import Projects from "@/components/Projects";
+import Projects from "@/components/Projects";
 import { Titles } from "@/components/text";
+
+import { theme as gratitudesTheme } from "./projects/gratitudes";
 
 export default function Home() {
   return (
@@ -14,9 +16,13 @@ export default function Home() {
           React, React Native, Ruby, Rails, GraphQL.
         </Titles.H3>
       </div>
-      {/* <Projects>
-        <Projects.Project />
-      </Projects> */}
+      <Projects>
+        <Projects.Project
+          backgroundColor={gratitudesTheme.backgroundColor}
+          subtitle="A daily journalling app."
+          title="Gratitudes"
+        />
+      </Projects>
     </>
   );
 }

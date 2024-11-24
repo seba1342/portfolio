@@ -58,3 +58,31 @@
 .text-pretty {
   text-wrap: pretty;
 }
+
+.text-dark {
+  color: var(--bark);
+
+  &::selection {
+    color: var(--oatmeal);
+    background: var(--bark);
+  }
+
+  &::-moz-selection {
+    color: var(--oatmeal);
+    background: var(--bark);
+  }
+}
+
+.text-light {
+  color: var(--oatmeal);
+
+  &::selection {
+    color: var(--bark);
+    background: var(--oatmeal);
+  }
+
+  &::-moz-selection {
+    color: var(--oatmeal);
+    background: var(--bark);
+  }
+}
