@@ -1,7 +1,6 @@
 import type { InferGetStaticPropsType } from "next";
 
-import Body from "@/components/text/Body";
-import { Titles } from "@/components/text/Titles";
+import { Body, Titles } from "@/components/text";
 import { shuffleArray } from "@/lib/helpers";
 import Image from "next/image";
 import Link from "next/link";
@@ -28,17 +27,10 @@ export default function Inspiration({
   allInspiration,
 }: InferGetStaticPropsType<typeof getStaticProps>) {
   return (
-    <div>
-      <Titles.H1>Inspiration</Titles.H1>
-      <Body>
-        This is a collection of inspiration I have found on the internet. It is
-        a mixture of websites, funny videos and art.
-      </Body>
-      <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 mt-12">
-        {allInspiration.map((inspiration) => (
-          <InspirationItem inspiration={inspiration} key={inspiration.id} />
-        ))}
-      </div>
+    <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+      {allInspiration.map((inspiration) => (
+        <InspirationItem inspiration={inspiration} key={inspiration.id} />
+      ))}
     </div>
   );
 }

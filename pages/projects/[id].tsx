@@ -1,5 +1,5 @@
+import { Titles } from "@/components/text";
 import { Mono } from "@/components/text/Mono";
-import { Titles } from "@/components/text/Titles";
 import { GetStaticPaths, GetStaticProps, InferGetStaticPropsType } from "next";
 import { ComponentProps } from "react";
 import Markdown from "react-markdown";
@@ -27,16 +27,8 @@ export const getStaticProps: GetStaticProps<Props> = async ({ params }) => {
 
 const components = {
   a: (props) => <a {...props} className={`${props.className} underline`} />,
-  h1: (props) => (
-    <Titles.H1 className={`${props.className} pb-4`}>
-      {props.children}
-    </Titles.H1>
-  ),
-  h2: (props) => (
-    <Titles.H2 className={`${props.className} mt-8`}>
-      {props.children}
-    </Titles.H2>
-  ),
+  h1: (props) => <Titles.H1>{props.children}</Titles.H1>,
+  h2: (props) => <Titles.H2>{props.children}</Titles.H2>,
   p: (props) => <p {...props} className={`${props.className} pb-4`} />,
   ul: (props) => (
     <ul {...props} className={`${props.className} list-disc list-inside`} />
@@ -53,7 +45,7 @@ export default function Page({
 
   return (
     <div className="w-full text-left">
-      <Titles.H1 className="mb-4">{project.title}</Titles.H1>
+      <Titles.H1>{project.title}</Titles.H1>
       <Mono.Body className="font-mono text-base mb-8">
         {project.type} • {project.date}
       </Mono.Body>

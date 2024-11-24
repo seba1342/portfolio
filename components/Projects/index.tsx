@@ -6,7 +6,13 @@ function Projects({ children }: { children: React.ReactNode }) {
   );
 }
 
-function Project({}) {
+function Project({
+  backgroundColor,
+  title,
+}: {
+  backgroundColor: string;
+  title: string;
+}) {
   return (
     <div>
       <Titles.H3>Project Title</Titles.H3>
