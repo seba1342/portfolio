@@ -1,6 +1,8 @@
+import Image, { StaticImageData } from "next/image";
 import Link from "next/link";
 
-import { Titles } from "../text";
+import ImageFrame from "../ImageFrame";
+import { Body, Titles } from "../text";
 
 function Projects({ children }: { children: React.ReactNode }) {
   return (
@@ -12,21 +14,28 @@ function Projects({ children }: { children: React.ReactNode }) {
 
 function Project({
   backgroundColor,
+  href,
+  image,
   subtitle,
   title,
 }: {
   backgroundColor: string;
+  href: string;
+  image: StaticImageData;
   subtitle: string;
   title: string;
 }) {
   return (
     <Link
-      className="p-4 rounded-2xl pb-24 transition-transform ease-in-out hover:scale-[102%]"
-      href="/projects/gratitudes"
+      className="group p-6 rounded-2xl transition-transform ease-in-out hover:scale-[102%] flex justify-center"
+      href={href}
       style={{ backgroundColor }}
     >
-      <Titles.H2 color="light">{title}</Titles.H2>
-      <Titles.H3 color="light">{subtitle}</Titles.H3>
+      <div className="w-2/3 self-end">
+        <Titles.H3 spacing="mb-0 md:mb-2">{title}</Titles.H3>
+        <Body.Small>{subtitle}</Body.Small>
+      </div>
+      <ImageFrame alt={`${title} - ${subtitle}`} image={image} />
     </Link>
   );
 }

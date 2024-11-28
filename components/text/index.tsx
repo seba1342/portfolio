@@ -1,13 +1,19 @@
 import React from "react";
 
-type TextProps = { children: React.ReactNode; color?: "dark" | "light" };
+type TextProps = {
+  children: React.ReactNode;
+  className?: string;
+  color?: "dark" | "light";
+  spacing?: string;
+};
 
 function textClassFactory(
   className: string,
   props: Omit<TextProps, "children">
 ) {
   const internalColor = props.color ?? "dark";
-  return `${className} text-${internalColor} mb-4 md:mb-6`;
+  const internalSpacing = props.spacing ?? "mb-4 md:mb-6";
+  return `${className} text-${internalColor} ${internalSpacing} ${props.className}`;
 }
 
 const Titles = {

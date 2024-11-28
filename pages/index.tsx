@@ -2,11 +2,12 @@ import Projects from "@/components/Projects";
 import { Titles } from "@/components/text";
 
 import { theme as gratitudesTheme } from "./projects/gratitudes";
+import gratitudesImage from "./projects/gratitudes/assets/gratitudes.png";
 
 export default function Home() {
   return (
     <>
-      <div className="flex flex-col max-w-7xl min-h-full justify-end md:pt-24">
+      <div className="flex flex-col max-w-6xl min-h-full justify-end md:pt-24">
         <Titles.H1>
           I use code to build engaging interactions and experiences. I love the
           crossover between design and computing.
@@ -18,7 +19,9 @@ export default function Home() {
       </div>
       <Projects>
         <Projects.Project
-          backgroundColor={gratitudesTheme.backgroundColor}
+          backgroundColor={gratitudesTheme.alternateBackgroundColor}
+          href="/projects/gratitudes"
+          image={gratitudesImage}
           subtitle="A daily journalling app."
           title="Gratitudes"
         />

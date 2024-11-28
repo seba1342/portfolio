@@ -3,6 +3,7 @@
 @tailwind utilities;
 
 @import url("components/text/text.css");
+@import url("components/ImageFrame/image-frame.css");
 
 :root {
   --bark: #341109;
