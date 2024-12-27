@@ -1,7 +1,6 @@
 import Image, { StaticImageData } from "next/image";
 import Link from "next/link";
 
-import ImageFrame from "../ImageFrame";
 import { Body, Titles } from "../text";
 
 function Projects({ children }: { children: React.ReactNode }) {
@@ -13,13 +12,13 @@ function Projects({ children }: { children: React.ReactNode }) {
 }
 
 function Project({
-  backgroundColor,
+  backgroundClass,
   href,
   image,
   subtitle,
   title,
 }: {
-  backgroundColor: string;
+  backgroundClass?: string;
   href: string;
   image: StaticImageData;
   subtitle: string;
@@ -27,15 +26,18 @@ function Project({
 }) {
   return (
     <Link
-      className="group p-6 rounded-2xl transition-transform ease-in-out hover:scale-[102%] flex justify-center"
+      className={`group p-6 rounded-2xl transition-transform ease-in-out hover:scale-[102%] flex justify-center ${
+        backgroundClass ?? ""
+      }`}
       href={href}
-      style={{ backgroundColor }}
     >
       <div className="w-2/3 self-end">
-        <Titles.H3 spacing="mb-0 md:mb-2">{title}</Titles.H3>
-        <Body.Small>{subtitle}</Body.Small>
+        <Titles.H3 color="light" spacing="mb-0 md:mb-2">
+          {title}
+        </Titles.H3>
+        <Body.Small color="light">{subtitle}</Body.Small>
       </div>
-      <ImageFrame alt={`${title} - ${subtitle}`} image={image} />
+      <Image alt={`${title} - ${subtitle}`} className="w-1/3" src={image} />
     </Link>
   );
 }

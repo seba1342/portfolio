@@ -1,6 +1,7 @@
 import React from "react";
 
 type TextProps = {
+  align?: "center" | "left" | "right";
   children: React.ReactNode;
   className?: string;
   color?: "dark" | "light";
@@ -13,7 +14,10 @@ function textClassFactory(
 ) {
   const internalColor = props.color ?? "dark";
   const internalSpacing = props.spacing ?? "mb-4 md:mb-6";
-  return `${className} text-${internalColor} ${internalSpacing} ${props.className}`;
+  const internalAlign = props.align ?? "left";
+  return `${className} text-${internalColor} ${internalSpacing} text-${internalAlign} ${
+    props.className ?? ""
+  }`;
 }
 
 const Titles = {
@@ -37,4 +41,12 @@ const Body = {
   ),
 };
 
-export { Body, Titles };
+const Mono = {
+  Default: ({ children, ...props }: TextProps) => (
+    <p className={textClassFactory("mono", { ...props, spacing: "mb-0" })}>
+      {children}
+    </p>
+  ),
+};
+
+export { Body, Mono, Titles };

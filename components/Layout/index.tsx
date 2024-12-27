@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 
+import { GeistMono } from "geist/font/mono";
 import localFont from "next/font/local";
 import Head from "next/head";
 
@@ -29,7 +30,7 @@ export default function RootLayout({
 }) {
   return (
     <div
-      className={`${tobias.variable} ${soehne.variable} pb-24 min-h-[100vh]`}
+      className={`${tobias.variable} ${soehne.variable} ${GeistMono.variable} pb-24 min-h-[100vh] flex flex-col text-pretty flex-1 items-center`}
     >
       <Head>
         <link href="/favicon.ico" rel="icon" />
@@ -37,11 +38,7 @@ export default function RootLayout({
         <meta content="Sebastien Bailouni" name="og:title" />
       </Head>
       <Header />
-      <main
-        className={`flex flex-col justify-center text-pretty px-2 md:px-6 flex-1 pt-[80px]`}
-      >
-        {children}
-      </main>
+      <main>{children}</main>
     </div>
   );
 }

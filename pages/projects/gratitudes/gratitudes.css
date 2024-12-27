@@ -1,0 +1,20 @@
+.gratitudes__background {
+  background: radial-gradient(
+    77.37% 50% at 50% 100%,
+    #61305e 0%,
+    #452644 72.87%,
+    #311730 100%
+  );
+  animation: breathe 5s infinite alternate;
+}
+
+@keyframes breathe {
+  0% {
+    background-size: 100% 100%;
+    background-position: 50% 100%;
+  }
+  100% {
+    background-size: 150% 150%;
+    background-position: 50% 70%;
+  }
+}
