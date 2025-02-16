@@ -4,7 +4,6 @@ const nextConfig = {
     remotePatterns: [{ hostname: "images.are.na", protocol: "https" }],
   },
   reactStrictMode: true,
-  transpilePackages: ["geist"],
 };
 
 module.exports = nextConfig;
