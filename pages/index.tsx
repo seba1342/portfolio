@@ -6,7 +6,7 @@ import gratitudesImage from "./projects/gratitudes/assets/gratitudes.png";
 
 export default function Home() {
   return (
-    <Content className="pt-20">
+    <Content>
       <div className="flex flex-col  min-h-full justify-end md:pt-24">
         <Titles.H1>
           I use code to build engaging interactions and experiences. I love the

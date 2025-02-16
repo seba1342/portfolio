@@ -9,14 +9,12 @@ import Button from "../Button";
 import { Body, Titles } from "../text";
 
 function Hero({
-  backgroundColor,
   href,
   image,
   style,
   subtitle,
   title,
 }: {
-  backgroundColor: string;
   href: string;
   image: StaticImageData;
   style: string;
@@ -24,8 +22,8 @@ function Hero({
   title: string;
 }) {
   return (
-    <header
-      className={`gratitudes__background flex flex-col justify-center items-center h-full pt-36 pb-16 w-[100vw] mt-[92px] relative ${style}`}
+    <div
+      className={`gratitudes__background flex flex-col justify-center items-center h-full pt-36 pb-16 w-full mt-[92px] relative ${style}`}
     >
       <Titles.H1 align="center" color="light">
         {title}
@@ -42,21 +40,21 @@ function Hero({
         </Button>
       </div>
 
-      <div className="flex flex-row gap-12 items-center justify-center">
+      <div className="flex flex-row gap-1 sm:gap-12 items-center justify-center w-full">
         <Image
           alt="Gratitudes home page"
-          className="max-w-[300px]"
+          className="w-1/2 max-w-[300px]"
           priority
           src={gratitudesHomeImage}
         />
         <Image
           alt="Gratitudes entry page"
-          className="max-w-[300px]"
+          className="w-1/2 max-w-[300px]"
           priority
           src={gratitudesEntryImage}
         />
       </div>
-    </header>
+    </div>
   );
 }
 

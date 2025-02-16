@@ -1,6 +1,7 @@
 import Image, { StaticImageData } from "next/image";
 import Link from "next/link";
 
+import ScaleOnHover from "../ScaleOnHover";
 import { Body, Titles } from "../text";
 
 function Projects({ children }: { children: React.ReactNode }) {
@@ -25,20 +26,22 @@ function Project({
   title: string;
 }) {
   return (
-    <Link
-      className={`group p-6 rounded-2xl transition-transform ease-in-out hover:scale-[102%] flex justify-center ${
-        backgroundClass ?? ""
-      }`}
-      href={href}
-    >
-      <div className="w-2/3 self-end">
-        <Titles.H3 color="light" spacing="mb-0 md:mb-2">
-          {title}
-        </Titles.H3>
-        <Body.Small color="light">{subtitle}</Body.Small>
-      </div>
-      <Image alt={`${title} - ${subtitle}`} className="w-1/3" src={image} />
-    </Link>
+    <ScaleOnHover>
+      <Link
+        className={`group p-6 rounded-2xl flex justify-center ${
+          backgroundClass ?? ""
+        }`}
+        href={href}
+      >
+        <div className="w-2/3 self-end">
+          <Titles.H3 color="light" spacing="mb-0 md:mb-2">
+            {title}
+          </Titles.H3>
+          <Body.Small color="light">{subtitle}</Body.Small>
+        </div>
+        <Image alt={`${title} - ${subtitle}`} className="w-1/3" src={image} />
+      </Link>
+    </ScaleOnHover>
   );
 }
 

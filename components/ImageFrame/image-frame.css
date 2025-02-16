@@ -1,0 +1,15 @@
+:root {
+  --border-radius: 24px;
+}
+
+.image-frame {
+  box-shadow: inset 0px 0px 5px rgba(255, 255, 255, 0.5);
+  content: "";
+  display: block;
+  border-radius: var(--border-radius);
+
+  & + img {
+    filter: drop-shadow(0px 0px 30px rgba(52, 17, 9, 0.33));
+    border-radius: var(--border-radius);
+  }
+}

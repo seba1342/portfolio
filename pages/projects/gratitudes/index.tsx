@@ -18,7 +18,7 @@ export default function Gratitudes() {
         </FixedBanner.Text>
       </FixedBanner>
       <Page.Hero subtitle="A daily journalling app." title="Gratitudes" />
-      <Content className="py-24">
+      <Content className="pt-10">
         <Titles.H3>
           Gratitudes is a simple journalling app. It notifies you every day to
           stop and reflect on what you are grateful for.
@@ -27,7 +27,8 @@ export default function Gratitudes() {
           I designed and built Gratitudes so I could be reminded to reflect each
           day. It also serves as a repository for all my past entries.
         </Titles.H3>
-        <Titles.H2>Tech Stack</Titles.H2>
+        <hr className="mx-auto h-px my-8 bg-softBark border-0 mt-12 w-[500px] max-w-full" />
+        <Titles.H2 className="pt-8">Tech Stack</Titles.H2>
         <Titles.H3>React Native and Expo</Titles.H3>
         <Body.Default>
           React Native has proven to be a valuable framework for building native

@@ -1,5 +1,6 @@
 import * as COLORS from "@/lib/colors";
 
+import ScaleOnHover from "../ScaleOnHover";
 import { Mono } from "../text";
 
 type Props = Readonly<{ backgroundColor?: string; children: string }>;
@@ -9,11 +10,13 @@ export default function Button({
   children,
 }: Props) {
   return (
-    <button
-      className="py-5 px-4 rounded-lg hover:scale-[102%] transition-transform min-w-[150px] flex items-center justify-center"
-      style={{ backgroundColor }}
-    >
-      <Mono.Default color="dark">{children}</Mono.Default>
-    </button>
+    <ScaleOnHover>
+      <button
+        className="flex flex-1 justify-center py-5 px-4 rounded-lg w-full sm:min-w-[160px]"
+        style={{ backgroundColor }}
+      >
+        <Mono.Default color="dark">{children}</Mono.Default>
+      </button>
+    </ScaleOnHover>
   );
 }

@@ -30,7 +30,7 @@ export default function RootLayout({
 }) {
   return (
     <div
-      className={`${tobias.variable} ${soehne.variable} ${GeistMono.variable} pb-24 min-h-[100vh] flex flex-col text-pretty flex-1 items-center`}
+      className={`${tobias.variable} ${soehne.variable} ${GeistMono.variable} pb-24 min-h-[100vh] flex flex-col text-pretty flex-1`}
     >
       <Head>
         <link href="/favicon.ico" rel="icon" />
