@@ -39,7 +39,12 @@ function Project({
           </Titles.H3>
           <Body.Small color="light">{subtitle}</Body.Small>
         </div>
-        <Image alt={`${title} - ${subtitle}`} className="w-1/3" src={image} />
+        <Image
+          alt={`${title} - ${subtitle}`}
+          className="w-1/3"
+          priority
+          src={image}
+        />
       </Link>
     </ScaleOnHover>
   );
