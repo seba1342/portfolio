@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 
-import { GeistMono } from "geist/font/mono";
 import localFont from "next/font/local";
 import Head from "next/head";
 
@@ -18,6 +17,12 @@ export const soehne = localFont({
   variable: "--font-soehne",
 });
 
+export const geistMono = localFont({
+  display: "swap",
+  src: "./fonts/GeistMono-Regular.woff2",
+  variable: "--font-geist-mono",
+});
+
 export const metadata: Metadata = {
   description: "Portfolio",
   title: "Sebastien Bailouni",
@@ -30,7 +35,7 @@ export default function RootLayout({
 }) {
   return (
     <div
-      className={`${tobias.variable} ${soehne.variable} ${GeistMono.variable} pb-24 min-h-[100vh] flex flex-col text-pretty flex-1`}
+      className={`${tobias.variable} ${soehne.variable} ${geistMono.variable} pb-24 min-h-[100vh] flex flex-col text-pretty flex-1`}
     >
       <Head>
         <link href="/favicon.ico" rel="icon" />
