@@ -1,29 +1,27 @@
 /* Typography Styles - Default (Mobile First) */
 .h1 {
   font-size: 48px;
-  line-height: 1;
+  line-height: 1.05;
   font-family: var(--font-tobias);
 
   @media (min-width: 768px) {
     font-size: 81px;
-    line-height: 1;
   }
 }
 
 .h2 {
   font-size: 36px;
-  line-height: 1;
+  line-height: 1.1;
   font-family: var(--font-tobias);
 
   @media (min-width: 768px) {
     font-size: 64px;
-    line-height: 1;
   }
 }
 
 .h3 {
   font-size: 24px;
-  line-height: 1;
+  line-height: 1.3;
   font-family: var(--font-tobias);
 
   @media (min-width: 768px) {
@@ -34,7 +32,6 @@
 
 .body {
   font-size: 16px;
-  line-height: 1;
   font-family: var(--font-soehne);
 
   @media (min-width: 768px) {
@@ -56,12 +53,11 @@
 
 .mono {
   font-size: 14px;
-  line-height: 1;
+  line-height: 1.2;
   font-family: var(--font-geist-mono);
 
   @media (min-width: 768px) {
     font-size: 12px;
-    line-height: 1;
   }
 }
 
