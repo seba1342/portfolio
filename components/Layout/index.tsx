@@ -1,9 +1,12 @@
 import type { Metadata } from "next";
 
+import dynamic from "next/dynamic";
 import localFont from "next/font/local";
 import Head from "next/head";
 
 import Header from "../Header";
+
+const Campfire = dynamic(() => import("../Campfire"), { ssr: false });
 
 export const tobias = localFont({
   display: "swap",
@@ -35,15 +38,18 @@ export default function RootLayout({
 }) {
   return (
     <div
-      className={`${tobias.variable} ${soehne.variable} ${geistMono.variable} pb-24 min-h-[100vh] flex flex-col text-pretty flex-1`}
+      className={`${tobias.variable} ${soehne.variable} ${geistMono.variable}`}
     >
       <Head>
         <link href="/favicon.ico" rel="icon" />
         <meta content="Portfolio" name="description" />
         <meta content="Sebastien Bailouni" name="og:title" />
       </Head>
-      <Header />
-      <main>{children}</main>
+      <div className="pb-24 min-h-[85vh] flex flex-col text-pretty flex-1">
+        <Header />
+        <main>{children}</main>
+      </div>
+      <Campfire />
     </div>
   );
 }

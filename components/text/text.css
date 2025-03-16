@@ -52,12 +52,12 @@
 }
 
 .mono {
-  font-size: 14px;
+  font-size: 12px;
   line-height: 1.2;
   font-family: var(--font-geist-mono);
 
   @media (min-width: 768px) {
-    font-size: 12px;
+    font-size: 14px;
   }
 }
 

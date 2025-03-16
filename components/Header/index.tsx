@@ -30,9 +30,7 @@ function Item({ type }: { type: "inspiration" | "projects" }) {
         className={pathname.includes(type) ? `underline` : ""}
         href={`/${type}`}
       >
-        <Mono.Default className="mb-[0px] text-xs capitalize">
-          {type}
-        </Mono.Default>
+        <Mono.Default className="mb-[0px] capitalize">{type}</Mono.Default>
       </Link>
     </li>
   );
