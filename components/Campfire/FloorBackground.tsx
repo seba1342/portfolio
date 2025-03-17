@@ -57,14 +57,14 @@ function FloorBackground() {
 
   return (
     <div
-      className="absolute mono left-0 bottom-0"
+      className="absolute mono left-0 bottom-0 hidden sm:block"
       ref={containerRef}
       style={{
         fontFamily: "monospace",
-        lineHeight: isSmallDevice ? 2.3 : 1.6, // Adjust as needed for your font
+        lineHeight: 1.6,
         overflow: "hidden",
-        position: "absolute", // Important for background positioning
-        whiteSpace: "pre", // Preserve spaces and line breaks
+        position: "absolute",
+        whiteSpace: "pre",
         width: "100%",
       }}
     >

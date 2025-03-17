@@ -2,7 +2,6 @@ import { useIsSmallDevice } from "@/hooks/useWindowDimensions";
 import { oatmeal } from "@/lib/colors";
 import React, { CSSProperties, useEffect, useRef, useState } from "react";
 
-import { Mono } from "../text";
 import FloorBackground from "./FloorBackground";
 import { applyTaper, clamp, generateFireNoise, rndi } from "./helpers";
 
@@ -10,20 +9,33 @@ const FONT_SIZE = 16;
 const LINE_HEIGHT = 1;
 const CHAR_HEIGHT = 0.6;
 const COLS = 50;
+const SMALL_DEVICE_FIRE_OFFSET = -125;
 
 const flame = "...::/\\/\\/\\+=*fireFIRE#";
 const logs = ["(` .__ _  ___,')", "`'(_ )_)( _)_ )'"];
 const person = [
-  "              ,&&&. ",
+  "              ,seb.",
   "              .,.&& ",
   "              \\=__/ ",
   "              ,'-'. ",
-  "  ,,      _.__|/ /| ",
-  "-((------((_|___/ | ",
+  "          _.__|/ /| ",
+  "-00------((_|___/ | ",
   "          ((  `'--| ",
-  "          \\ -._/. ",
-  "        <_,_`--'| ",
-  "          <_,-'__,' ",
+  "          \\\\ \\-._/.",
+  "         <_,\\_\\`--'|",
+  "           <_,-'__,'  ",
+];
+const annoyedPerson = [
+  "              ,seb.",
+  "              o,o&& ",
+  "              \\^__/ ",
+  "              ,'-'. ",
+  "          _.__|| || ",
+  "  -00-----((_|___/|",
+  "          ((  `'--| ",
+  "          \\\\ \\-._/.",
+  "         <_,\\_\\`--'|",
+  "           <_,-'__,'  ",
 ];
 
 function Campfire(): JSX.Element {
@@ -123,9 +135,11 @@ function Campfire(): JSX.Element {
 
   const isSmallDevice = useIsSmallDevice();
 
+  const activePerson = isMouseDown ? annoyedPerson : person;
+
   return (
     <div
-      className={`relative flex flex-col items-center select-none w-full overflow-x-hidden mb-12 ${
+      className={`relative flex flex-col items-center select-none w-full overflow-hidden mb-12 scale-90 sm:scale-100 ${
         isMouseDown ? "cursor-grabbing" : "cursor-grab"
       }`}
       onMouseDown={handleMouseDown}
@@ -142,7 +156,7 @@ function Campfire(): JSX.Element {
         style={{
           fontSize: `${FONT_SIZE}px`,
           lineHeight: LINE_HEIGHT,
-          marginLeft: isSmallDevice ? -125 : 0,
+          marginLeft: isSmallDevice ? SMALL_DEVICE_FIRE_OFFSET : 0,
         }}
       >
         {fire.map((row, i) => (
@@ -155,12 +169,8 @@ function Campfire(): JSX.Element {
         className="absolute mono flex flex-col justify-center whitespace-pre bottom-8 z-10"
         style={isSmallDevice ? { right: 20 } : { marginLeft: 350 }}
       >
-        {person.map((personRow, i) => (
-          <CharRow
-            key={`person-${i}`}
-            splitIntoSpans
-            style={{ lineHeight: 1.2 }}
-          >
+        {activePerson.map((personRow, i) => (
+          <CharRow key={`person-${i}`} splitIntoSpans style={{ lineHeight: 1 }}>
             {personRow}
           </CharRow>
         ))}
@@ -169,7 +179,10 @@ function Campfire(): JSX.Element {
         {logs.map((logRow, i) => (
           <CharRow
             key={`log-${i}`}
-            style={{ lineHeight: 1.4, marginLeft: isSmallDevice ? -150 : 0 }}
+            style={{
+              lineHeight: 1.4,
+              marginLeft: isSmallDevice ? SMALL_DEVICE_FIRE_OFFSET : 0,
+            }}
           >
             {logRow}
           </CharRow>
