@@ -12,7 +12,7 @@
     "@vercel/analytics": "^1.2.2",
     "@vercel/speed-insights": "^1.0.10",
     "gray-matter": "^4.0.3",
-    "next": "14.0.3",
+    "next": "14.2.24",
     "react": "^18",
     "react-dom": "^18",
     "react-markdown": "^9.0.1"
