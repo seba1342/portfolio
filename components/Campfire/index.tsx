@@ -9,7 +9,6 @@ import { applyTaper, clamp, generateFireNoise, rndi } from "./helpers";
 const FONT_SIZE = 16;
 const LINE_HEIGHT = 1;
 const CHAR_HEIGHT = 0.6;
-const FIRE_WIDTH_PERCENTAGE = 0.3;
 const COLS = 50;
 
 const flame = "...::/\\/\\/\\+=*fireFIRE#";
@@ -25,37 +24,6 @@ const person = [
   "          \\ -._/. ",
   "        <_,_`--'| ",
   "          <_,-'__,' ",
-];
-const tree = [
-  "              _{ _{\\{\\/}/}/}__",
-  "             {/{/\\}{/{/\\}(\\}{/\\} _",
-  "            {/{/\\}{/{/\\}(_)\\}\\{/{/\\}  _",
-  "         {\\{/(\\}\\}{/{/\\}\\}{/){/\\}\\} /\\}",
-  "        {/{/(_)/}{\\{/)\\}\\{\\(_){/}/}/}/}",
-  "       _{\\{/{/{\\{/{/(_)/}/}/}{\\(/}/}/}",
-  "      {/{/{\\{\\{\\(/}{\\{\\/}/}{\\}(_){\\/}\\}",
-  "      _{\\{/{\\{/(_)\\}/}{/{/{/\\}\\})\\}{/\\}",
-  "     {/{/{\\{\\(/}{/{\\{\\{\\/})/}{\\(_)/}/}\\}",
-  "      {\\{\\/}(_){\\{\\{\\/}/}(_){\\/}{\\/}/}\\)/}",
-  "       {/{\\{\\/}{/{\\{\\{\\/}/}{\\{\\/}/}\\}(_)",
-  "      {/{\\{\\/}{/){\\{\\{\\/}/}{\\{\\(/}/}\\}/}",
-  "       {/{\\{\\/}(_){\\{\\{\\(/}/}{\\(_)/}/}\\}",
-  "         {/({/{\\{/{\\{\\/}(_){\\/}/}\\}/}(\\}",
-  "          (_){/{\\/}{\\{\\/}/}{\\{\\)/}/}(_)",
-  "            {/{/{\\{\\/}{/{\\{\\{\\(_)/}",
-  "             {/{\\{\\{\\/}/}{\\{\\}/}",
-  "              {){/ {\\/}{\\/} \\}\\}",
-  "              (_)  \\.-'.-/",
-  "          __...--- |'-.-'| --...__",
-  "   _...--\"   .-'   |'-.-'|  ' -.  \"\"--..__",
-  " -\"    ' .  . '    |.'-._| '  . .  '      ",
-  " .  '-  '    .--'  | '-.'|    .  '  . '",
-  "          ' ..     |'-_.-|",
-  "  .  '  .       _.-|-._ -|-._  .  '  .",
-  "              .'   |'- .-|   '.",
-  "  ..-'   ' .  '.   `-._.-   .'  '  - .",
-  "   .-' '        '-._______.-'     '  .",
-  "        .      ~,",
 ];
 
 function Campfire(): JSX.Element {
@@ -74,12 +42,8 @@ function Campfire(): JSX.Element {
       if (containerRef.current) {
         const width = containerRef.current.offsetWidth;
         const height = containerRef.current.offsetHeight;
-        const newCols = Math.max(
-          Math.floor(
-            (width * FIRE_WIDTH_PERCENTAGE) / (FONT_SIZE * CHAR_HEIGHT)
-          ),
-          30
-        );
+        const newCols = Math.floor(width / (FONT_SIZE * CHAR_HEIGHT));
+
         const newRows =
           Math.floor(height / (FONT_SIZE * LINE_HEIGHT)) - logs.length;
 
@@ -129,19 +93,15 @@ function Campfire(): JSX.Element {
         for (let x = 0; x < COLS; x++) {
           const index = x + y * COLS;
           const u = data[index];
-          let char = " ";
+          let CharRow = " ";
           if (u > 0) {
-            char = flame[clamp(u, 0, flame.length - 1)];
+            CharRow = flame[clamp(u, 0, flame.length - 1)];
           }
-          newFire[y][x] = char;
+          newFire[y][x] = CharRow;
         }
       }
 
-      animationFrameRef.current = requestAnimationFrame(animate);
-      if (animationFrameRef.current % 5 !== 0) return;
-
       setFire(newFire);
-      // animationFrameRef.current = requestAnimationFrame(animate);
     };
 
     animationFrameRef.current = requestAnimationFrame(animate);
@@ -165,7 +125,7 @@ function Campfire(): JSX.Element {
 
   return (
     <div
-      className={`relative flex flex-col items-center select-none w-full overflow-hidden mb-12 h-full ${
+      className={`relative flex flex-col items-center select-none w-full overflow-x-hidden mb-12 ${
         isMouseDown ? "cursor-grabbing" : "cursor-grab"
       }`}
       onMouseDown={handleMouseDown}
@@ -174,73 +134,125 @@ function Campfire(): JSX.Element {
       onTouchEnd={handleMouseUp}
       onTouchStart={(e) => handleMouseDown(e.nativeEvent as any)}
       ref={containerRef}
-      style={{ height: "600px" }}
+      style={{ height: 400 }}
     >
-      {!isSmallDevice && <FloorBackground />}
+      <FloorBackground />
       <pre
         className="mono z-10"
         style={{
           fontSize: `${FONT_SIZE}px`,
           lineHeight: LINE_HEIGHT,
-          marginLeft: isSmallDevice ? -150 : 0,
+          marginLeft: isSmallDevice ? -125 : 0,
         }}
       >
         {fire.map((row, i) => (
-          <Char key={`fire-${i}`}>
-            {row.join("")}
-            {i < rows - 1 && "\n"}
-          </Char>
+          <CharRow key={`fire-${i}`} splitIntoSpans>
+            {row.join("") + "\n"}
+          </CharRow>
         ))}
       </pre>
       <div
         className="absolute mono flex flex-col justify-center whitespace-pre bottom-8 z-10"
-        style={isSmallDevice ? { right: 10 } : { marginLeft: 350 }}
+        style={isSmallDevice ? { right: 20 } : { marginLeft: 350 }}
       >
         {person.map((personRow, i) => (
-          <Char key={`person-${i}`} style={{ lineHeight: 1.2 }}>
+          <CharRow
+            key={`person-${i}`}
+            splitIntoSpans
+            style={{ lineHeight: 1.2 }}
+          >
             {personRow}
-          </Char>
+          </CharRow>
         ))}
       </div>
       <div className="mono flex flex-col justify-center whitespace-pre z-10">
         {logs.map((logRow, i) => (
-          <Char
+          <CharRow
             key={`log-${i}`}
             style={{ lineHeight: 1.4, marginLeft: isSmallDevice ? -150 : 0 }}
           >
             {logRow}
-          </Char>
-        ))}
-      </div>
-      <div
-        className={`absolute mono hidden md:flex flex-col justify-center whitespace-pre bottom-0 left-0 z-10`}
-      >
-        {tree.map((treeRow, i) => (
-          <Char key={`tree-${i}`} style={{ lineHeight: 1.2 }}>
-            {treeRow}
-          </Char>
+          </CharRow>
         ))}
       </div>
     </div>
   );
 }
 
-type CharProps = React.PropsWithChildren &
+function findFirstAndLastNonSpace(str: string): {
+  first: number;
+  last: number;
+} {
+  let first = -1;
+  let last = -1;
+
+  if (!str || str.length === 0) {
+    return { first, last }; // Handle empty or null strings
+  }
+
+  // Find the first non-space character
+  for (let i = 0; i < str.length; i++) {
+    if (str[i] !== " ") {
+      first = i - 3;
+      break;
+    }
+  }
+
+  // Find the last non-space character
+  for (let i = str.length - 1; i >= 0; i--) {
+    if (str[i] !== " " && str[i] !== "\n") {
+      last = i + 3;
+      break;
+    }
+  }
+
+  return { first, last };
+}
+
+type CharRowProps = React.PropsWithChildren &
   Readonly<{
     key: string;
+    splitIntoSpans?: boolean;
     style?: CSSProperties;
   }>;
 
-const Char = ({ style, ...props }: CharProps) => (
-  <span
-    style={{
-      backgroundColor: oatmeal,
-      fontSize: `${FONT_SIZE}px`,
-      lineHeight: LINE_HEIGHT,
-      ...style,
-    }}
-    {...props}
-  />
-);
+const CharRow = ({ children, splitIntoSpans = false, style }: CharRowProps) => {
+  if (!splitIntoSpans)
+    return (
+      <span
+        key={children?.toString()}
+        style={{
+          fontSize: `${FONT_SIZE}px`,
+          lineHeight: LINE_HEIGHT,
+          ...style,
+        }}
+      >
+        {children}
+      </span>
+    );
+
+  if (typeof children !== "string") return null;
+
+  const { first, last } = findFirstAndLastNonSpace(children);
+  const text = Array.from(children);
+
+  return (
+    <span>
+      {text.map((char, i) => (
+        <span
+          key={i}
+          style={{
+            backgroundColor: i >= first && i <= last ? oatmeal : "transparent",
+            fontSize: `${FONT_SIZE}px`,
+            lineHeight: LINE_HEIGHT,
+            ...style,
+          }}
+        >
+          {char}
+        </span>
+      ))}
+    </span>
+  );
+};
 
 export default Campfire;

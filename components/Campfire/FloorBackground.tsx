@@ -1,19 +1,21 @@
+import { useIsSmallDevice } from "@/hooks/useWindowDimensions";
 import { useEffect, useRef, useState } from "react";
 
 const baseFloor = [
-  '\' -.  ""--.....______......------"""""_________.....----\'\'\'\'\'\'"""""_________.....----',
-  " .    '   .             '         '   .   .  . '      '   .",
-  "               '    .                   '      '   .",
-  "             '             .                     . '   ",
-  "       '        .      .              '   '     '      .",
-  " '.                    '    .                 '    .  .  ",
-  ".          .                      '                .  ",
-  "    '                      '    .              .   .  ",
+  '\' -.  ""--.....______......-------_________.....-------_________.....----',
+  " .        .             '                  '                  .",
+  "                   .                                     ",
+  "           .                  .                         ",
+  "       '        .                      '                  .",
+  " '.                    '                      '          ",
+  "                                                        ",
+  "    '                             .                    '  ",
 ];
 
 function FloorBackground() {
   const [floor, setFloor] = useState<string[]>([]);
   const containerRef = useRef<HTMLDivElement>(null);
+  const isSmallDevice = useIsSmallDevice();
 
   useEffect(() => {
     const calculateFloor = () => {
@@ -59,7 +61,7 @@ function FloorBackground() {
       ref={containerRef}
       style={{
         fontFamily: "monospace",
-        lineHeight: "1.5", // Adjust as needed for your font
+        lineHeight: isSmallDevice ? 2.3 : 1.6, // Adjust as needed for your font
         overflow: "hidden",
         position: "absolute", // Important for background positioning
         whiteSpace: "pre", // Preserve spaces and line breaks
