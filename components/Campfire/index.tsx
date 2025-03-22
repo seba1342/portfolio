@@ -40,7 +40,7 @@ const annoyedPerson = [
 
 function Campfire(): JSX.Element {
   const [fire, setFire] = useState<string[][]>([]);
-  const animationFrameRef = useRef<null | number>(null);
+  const animationFrameRef = useRef<number>(0);
   const [rows, setRows] = useState(0);
   const [data, setData] = useState<number[]>([]);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -50,7 +50,7 @@ function Campfire(): JSX.Element {
 
   /** Setup the window resize observers */
   useEffect(() => {
-    const resizeObserver = new ResizeObserver((entries) => {
+    const resizeObserver = new ResizeObserver(() => {
       if (containerRef.current) {
         const width = containerRef.current.offsetWidth;
         const height = containerRef.current.offsetHeight;
@@ -72,8 +72,17 @@ function Campfire(): JSX.Element {
   }, []);
 
   useEffect(() => {
+    let frameCount = 0;
+    const targetFps = 12;
+    // Assuming 60fps browser refresh rate
+    const frameInterval = Math.floor(60 / targetFps);
+
     const animate = () => {
-      if (!rows) return;
+      frameCount = (frameCount + 1) % frameInterval;
+      if (frameCount !== 0) {
+        animationFrameRef.current = requestAnimationFrame(animate);
+        return;
+      }
 
       const time = performance.now() * 0.000015;
       const last = COLS * (rows - 1);
@@ -114,6 +123,7 @@ function Campfire(): JSX.Element {
       }
 
       setFire(newFire);
+      animationFrameRef.current = requestAnimationFrame(animate);
     };
 
     animationFrameRef.current = requestAnimationFrame(animate);
@@ -175,19 +185,21 @@ function Campfire(): JSX.Element {
           </CharRow>
         ))}
       </div>
-      <div className="mono flex flex-col justify-center whitespace-pre z-10">
-        {logs.map((logRow, i) => (
-          <CharRow
-            key={`log-${i}`}
-            style={{
-              lineHeight: 1.4,
-              marginLeft: isSmallDevice ? SMALL_DEVICE_FIRE_OFFSET : 0,
-            }}
-          >
-            {logRow}
-          </CharRow>
-        ))}
-      </div>
+      {fire.length > 0 && (
+        <div className="mono flex flex-col justify-center whitespace-pre z-10">
+          {logs.map((logRow, i) => (
+            <CharRow
+              key={`log-${i}`}
+              style={{
+                lineHeight: 1.4,
+                marginLeft: isSmallDevice ? SMALL_DEVICE_FIRE_OFFSET : 0,
+              }}
+            >
+              {logRow}
+            </CharRow>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

@@ -46,7 +46,7 @@ export default function RootLayout({
         <meta content="Portfolio" name="description" />
         <meta content="Sebastien Bailouni" name="og:title" />
       </Head>
-      <div className="pb-24 ">
+      <div className="pb-16">
         <Header />
         <main>{children}</main>
       </div>
