@@ -45,8 +45,34 @@ function Campfire(): JSX.Element {
   const [data, setData] = useState<number[]>([]);
   const containerRef = useRef<HTMLDivElement>(null);
   const [isMouseDown, setIsMouseDown] = useState(false);
+  const [isInViewport, setIsInViewport] = useState(false);
 
   const noise = generateFireNoise();
+
+  /** Add intersection observer to detect if the Campfire is in viewport */
+  useEffect(() => {
+    const observer = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting && !isInViewport) {
+        setIsInViewport(true);
+        return;
+      }
+
+      if (!entry.isIntersecting && isInViewport) {
+        setIsInViewport(false);
+        return;
+      }
+    });
+
+    if (containerRef.current) {
+      observer.observe(containerRef.current);
+    }
+
+    return () => {
+      if (containerRef.current) {
+        observer.unobserve(containerRef.current);
+      }
+    };
+  }, []);
 
   /** Setup the window resize observers */
   useEffect(() => {
@@ -72,6 +98,8 @@ function Campfire(): JSX.Element {
   }, []);
 
   useEffect(() => {
+    if (!isInViewport) return;
+
     let frameCount = 0;
     const targetFps = 12;
     // Assuming 60fps browser refresh rate

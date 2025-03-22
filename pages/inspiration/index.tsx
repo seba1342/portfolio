@@ -48,7 +48,7 @@ function InspirationItem({ inspiration }: { inspiration: Inspiration }) {
 
   return (
     <Link
-      className="relative aspect-w-1 aspect-h-1 w-96"
+      className="relative aspect-w-1 aspect-h-1 w-96 sm:w-80"
       href={inspiration.source.url}
       target="_blank"
     >
