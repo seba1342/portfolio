@@ -1,6 +1,6 @@
 import Content from "@/components/Layout/Content";
 import Projects from "@/components/Projects";
-import { Titles } from "@/components/text";
+import { Body, Titles } from "@/components/text";
 
 import gratitudesImage from "./projects/gratitudes/assets/gratitudes.png";
 
@@ -16,6 +16,25 @@ export default function Home() {
           While my toolbox is always evolving, it currently includes Typescript,
           React, React Native, Ruby, Rails, GraphQL.
         </Titles.H3>
+        <Body.Default className=" font-light">
+          Currently building{" "}
+          <a
+            className="underline underline-offset-4"
+            href="https://up.au"
+            target="_blank"
+          >
+            Up
+          </a>
+          , with an incredible group of people from{" "}
+          <a
+            className="underline underline-offset-4"
+            href="https://ferocia.com.au"
+            target="_blank"
+          >
+            Ferocia
+          </a>
+          .
+        </Body.Default>
       </div>
       <Projects>
         <Projects.Project

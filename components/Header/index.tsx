@@ -12,16 +12,15 @@ export default function Header() {
         <h1 className="font-sans text-xl md:text-2xl">
           <Link href="/">Sebastien Bailouni</Link>
         </h1>
-        <ul className="flex flex-row justify-center items-center">
+        <ul className="flex flex-row">
           <Item type="inspiration" />
-          <Item type="projects" />
         </ul>
       </div>
     </nav>
   );
 }
 
-function Item({ type }: { type: "inspiration" | "projects" }) {
+function Item({ type }: { type: "inspiration" }) {
   const pathname = usePathname();
 
   return (

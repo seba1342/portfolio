@@ -31,7 +31,7 @@ function Hero({
       <Body.Default align="center" color="light">
         {subtitle}
       </Body.Default>
-      <div className="flex flex-row gap-4 mt-4 pb-16">
+      <div className="flex flex-col sm:flex-row gap-4 mt-4 pb-16">
         <Button backgroundColor={theme.alternateBackgroundColor}>
           iOS Download
         </Button>

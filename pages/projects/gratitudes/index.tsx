@@ -1,7 +1,7 @@
 import FixedBanner from "@/components/FixedBanner";
 import Content from "@/components/Layout/Content";
 import Page from "@/components/Page";
-import { Body, Titles } from "@/components/text";
+import { Body, Mono, Titles } from "@/components/text";
 import * as COLORS from "@/lib/colors";
 
 export const theme = {
@@ -27,7 +27,9 @@ export default function Gratitudes() {
           I designed and built Gratitudes so I could be reminded to reflect each
           day. It also serves as a repository for all my past entries.
         </Titles.H3>
-        <hr className="mx-auto h-px my-8 bg-softBark border-0 mt-12 w-[500px] max-w-full" />
+        <Mono.Default className="w-full text-center py-12">
+          {">< >< >< >< >< >< >< >< ><"}
+        </Mono.Default>
         <Titles.H2 className="pt-8">Tech Stack</Titles.H2>
         <Titles.H3>React Native and Expo</Titles.H3>
         <Body.Default>
