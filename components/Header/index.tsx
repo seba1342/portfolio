@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
+import ScaleOnHover from "../ScaleOnHover";
+import ScrambleOnHover from "../ScrambleOnHover";
 import { Mono } from "../text";
 
 export const HEADER_HEIGHT = 80;
@@ -10,7 +12,9 @@ export default function Header() {
     <nav className="w-full fixed z-50 p-4 bg-oatmeal flex justify-center">
       <div className="max-w-7xl flex flex-1 justify-between items-center">
         <h1 className="font-sans text-xl md:text-2xl">
-          <Link href="/">Sebastien Bailouni</Link>
+          <Link href="/">
+            <ScaleOnHover>Sebastien Bailouni</ScaleOnHover>
+          </Link>
         </h1>
         <ul className="flex flex-row">
           <Item type="inspiration" />
@@ -29,7 +33,9 @@ function Item({ type }: { type: "inspiration" }) {
         className={pathname.includes(type) ? `underline` : ""}
         href={`/${type}`}
       >
-        <Mono.Default className="mb-[0px] capitalize">{type}</Mono.Default>
+        <Mono.Default className="mb-[0px] capitalize text-right">
+          <ScrambleOnHover>{type}</ScrambleOnHover>
+        </Mono.Default>
       </Link>
     </li>
   );

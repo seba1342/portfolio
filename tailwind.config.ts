@@ -22,6 +22,7 @@ const config: Config = {
         softBark: "var(--soft-bark)",
       },
       fontFamily: {
+        mono: ["var(--font-geist-mono)", ...defaultTheme.fontFamily.mono],
         sans: ["var(--font-soehne)", ...defaultTheme.fontFamily.sans],
         serif: ["var(--font-tobias)", ...defaultTheme.fontFamily.serif],
       },

@@ -5,6 +5,7 @@ import localFont from "next/font/local";
 import Head from "next/head";
 
 import Header from "../Header";
+import ScrambleOnHover from "../ScrambleOnHover";
 import { Mono } from "../text";
 
 const Campfire = dynamic(() => import("../Campfire"), { ssr: false });
@@ -64,7 +65,7 @@ export default function RootLayout({
             href="https://github.com/seba1342/portfolio"
             target="_blank"
           >
-            here (Github)
+            <ScrambleOnHover>here (Github)</ScrambleOnHover>
           </a>
           .
         </Mono.Default>

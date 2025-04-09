@@ -1,5 +1,6 @@
 import Content from "@/components/Layout/Content";
 import Projects from "@/components/Projects";
+import ScrambleOnHover from "@/components/ScrambleOnHover";
 import { Body, Titles } from "@/components/text";
 
 import gratitudesImage from "./projects/gratitudes/assets/gratitudes.png";
@@ -9,29 +10,28 @@ export default function Home() {
     <Content>
       <div className="flex flex-col  min-h-full justify-end md:pt-24">
         <Titles.H1>
-          I use code to build engaging interactions and experiences. I love the
-          crossover between design and computing.
+          I use code to build&nbsp;engaging interactions and experiences.
         </Titles.H1>
         <Titles.H3>
           While my toolbox is always evolving, it currently includes Typescript,
           React, React Native, Ruby, Rails, GraphQL.
         </Titles.H3>
-        <Body.Default className=" font-light">
-          Currently building{" "}
+        <Body.Default className="font-light">
+          I am currently building{" "}
           <a
-            className="underline underline-offset-4"
+            className="font-sans sm:font-mono underline underline-offset-2"
             href="https://up.au"
             target="_blank"
           >
-            Up
+            <ScrambleOnHover>Up</ScrambleOnHover>
           </a>
           , with an incredible group of people from{" "}
           <a
-            className="underline underline-offset-4"
+            className="font-sans sm:font-mono underline underline-offset-2"
             href="https://ferocia.com.au"
             target="_blank"
           >
-            Ferocia
+            <ScrambleOnHover>Ferocia</ScrambleOnHover>
           </a>
           .
         </Body.Default>

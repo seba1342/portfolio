@@ -9,7 +9,7 @@ const FONT_SIZE = 16;
 const LINE_HEIGHT = 1;
 const CHAR_HEIGHT = 0.6;
 const COLS = 50;
-const SMALL_DEVICE_FIRE_OFFSET = -125;
+const SMALL_DEVICE_FIRE_OFFSET = -90;
 
 const flame = "...::/\\/\\/\\+=*fireFIRE#";
 const logs = ["(` .__ _  ___,')", "`'(_ )_)( _)_ )'"];
@@ -205,7 +205,7 @@ function Campfire(): JSX.Element {
       </pre>
       <div
         className="absolute mono flex flex-col justify-center whitespace-pre bottom-8 z-10"
-        style={isSmallDevice ? { right: 20 } : { marginLeft: 350 }}
+        style={isSmallDevice ? { right: 0 } : { marginLeft: 350 }}
       >
         {activePerson.map((personRow, i) => (
           <CharRow key={`person-${i}`} splitIntoSpans style={{ lineHeight: 1 }}>
