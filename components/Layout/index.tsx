@@ -43,9 +43,12 @@ export default function RootLayout({
       className={`${tobias.variable} ${soehne.variable} ${geistMono.variable} flex flex-col text-pretty flex-1 min-h-[100vh] justify-between`}
     >
       <Head>
-        <link href="/favicon.ico" rel="icon" />
         <meta content="Portfolio" name="description" />
         <meta content="Sebastien Bailouni" name="og:title" />
+        <link
+          href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💕</text></svg>"
+          rel="icon"
+        />
       </Head>
       <div className="pb-16">
         <Header />
