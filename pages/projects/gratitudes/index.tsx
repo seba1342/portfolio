@@ -35,7 +35,13 @@ export default function Gratitudes() {
             backgroundColor={theme.alternateBackgroundColor}
             href="https://apps.apple.com/au/app/gratitudes/id6444113905"
           >
-            Download
+            iOS Download
+          </Button>
+          <Button
+            backgroundColor={theme.alternateBackgroundColor}
+            href="https://play.google.com/store/apps/details?id=com.bailouni.gratitudes"
+          >
+            Android Download
           </Button>
         </div>
 
