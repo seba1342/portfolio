@@ -72,7 +72,7 @@ function Campfire(): JSX.Element {
         observer.unobserve(containerRef.current);
       }
     };
-  }, []);
+  }, [isInViewport]);
 
   /** Setup the window resize observers */
   useEffect(() => {
@@ -208,7 +208,11 @@ function Campfire(): JSX.Element {
         style={isSmallDevice ? { right: 0 } : { marginLeft: 350 }}
       >
         {activePerson.map((personRow, i) => (
-          <CharRow key={`person-${i}`} splitIntoSpans style={{ lineHeight: 1 }}>
+          <CharRow
+            key={`person-${i}`}
+            splitIntoSpans
+            style={{ lineHeight: 1.1 }}
+          >
             {personRow}
           </CharRow>
         ))}
@@ -219,7 +223,7 @@ function Campfire(): JSX.Element {
             <CharRow
               key={`log-${i}`}
               style={{
-                lineHeight: 1.4,
+                lineHeight: 1.5,
                 marginLeft: isSmallDevice ? SMALL_DEVICE_FIRE_OFFSET : 0,
               }}
             >
