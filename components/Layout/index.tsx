@@ -45,6 +45,12 @@ export default function RootLayout({
       <Head>
         <meta content="Portfolio" name="description" />
         <meta content="Sebastien Bailouni" name="og:title" />
+
+        <meta content="/share.png" property="og:image" />
+        <meta content="image/png" property="og:image:type" />
+        <meta content="1238" property="og:image:width" />
+        <meta content=" 826" property="og:image:height" />
+
         <link
           href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💕</text></svg>"
           rel="icon"
