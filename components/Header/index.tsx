@@ -10,7 +10,7 @@ export const HEADER_HEIGHT = 80;
 export default function Header() {
   return (
     <nav className="w-full fixed z-50 p-4 bg-oatmeal flex justify-center">
-      <div className="max-w-7xl flex flex-1 justify-between items-center">
+      <div className="max-w-6xl flex flex-1 justify-between items-center px-3 md:px-6">
         <h1 className="font-sans text-xl md:text-2xl">
           <Link href="/">
             <ScaleOnHover>Sebastien Bailouni</ScaleOnHover>

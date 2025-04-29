@@ -37,8 +37,25 @@ const annoyedPerson = [
   "         <_,\\_\\`--'|",
   "           <_,-'__,'  ",
 ];
+const lostMessage = [
+  "⠀⠀⠀⠀⠀⠀⠀⢀⣠⠤⠴⠒⠒⠒⠒⠒⠒⠒⠦⢤⣀⡀⠀⠀⠀⠀⠀⠀⠀",
+  "⠀⠀⠀⠀⣀⡴⠚⠉⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠉⠳⢦⡀⠀⠀⠀⠀",
+  "⠀⠀⢠⠞⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠙⢳⡀⠀⠀",
+  "⠀⣰⠃⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠙⣆⠀",
+  "⢰⠃⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠸⡆",
+  "⡟⠀⠀⠀⠀⠀⠀⠀Are you lost?⠀ ⠀⠀⠀⠀⠀⠀⠀⣷",
+  "⣧⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡿",
+  "⢸⡄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢠⠇",
+  "⠀⢳⡄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢠⡯⠁",
+  "⠀⠀⠙⢦⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⡴⠋⠁⠀",
+  "⠀⠀⠀⠀⠙⠦⣄⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣠⠶⠋⠀⠀⠀⠀",
+  "⠀⠀⠀⠀⠀⠀⠀⠉⠛⠲⠤⢤⣀⠀⠀⠀⠀⠀⢶⠶⠛⠉⠀⠀⠀⠀⠀⠀⠀",
+  "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠙⠳⢦⣄⡀⠈⠳⣄⠀⠀⠀⠀⠀⠀⠀⠀",
+  "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠙⠓⢦⣝⣦⡀⠀⠀⠀⠀⠀⠀",
+  "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠙⣓⠀⠀⠀⠀⠀⠀",
+];
 
-function Campfire(): JSX.Element {
+function Campfire({ is404 = false }: { is404?: boolean }): JSX.Element {
   const [fire, setFire] = useState<string[][]>([]);
   const animationFrameRef = useRef<number>(0);
   const [rows, setRows] = useState(0);
@@ -161,7 +178,7 @@ function Campfire(): JSX.Element {
         cancelAnimationFrame(animationFrameRef.current);
       }
     };
-  }, [rows, data, isMouseDown, noise]);
+  }, [rows, data, isMouseDown, noise, isInViewport]);
 
   const handleMouseDown = (e: React.MouseEvent) => {
     setIsMouseDown(true);
@@ -186,7 +203,7 @@ function Campfire(): JSX.Element {
       onTouchEnd={handleMouseUp}
       onTouchStart={(e) => handleMouseDown(e.nativeEvent as any)}
       ref={containerRef}
-      style={{ height: 400 }}
+      style={{ height: is404 ? 500 : 400 }}
     >
       <FloorBackground />
       <pre
@@ -203,6 +220,22 @@ function Campfire(): JSX.Element {
           </CharRow>
         ))}
       </pre>
+      {is404 && (
+        <div
+          className="mono whitespace-pre flex flex-col justify-center absolute"
+          style={
+            isSmallDevice
+              ? { marginRight: 36, marginTop: 36, right: 0 }
+              : { marginLeft: 170, marginTop: 50 }
+          }
+        >
+          {lostMessage.map((lostMessage, i) => (
+            <CharRow key={`lostMessage-${i}`} style={{ lineHeight: 1.1 }}>
+              {lostMessage}
+            </CharRow>
+          ))}
+        </div>
+      )}
       <div
         className="absolute mono flex flex-col justify-center whitespace-pre bottom-8 z-10"
         style={isSmallDevice ? { right: 0 } : { marginLeft: 350 }}

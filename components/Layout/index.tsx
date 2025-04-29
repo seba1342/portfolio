@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import dynamic from "next/dynamic";
 import localFont from "next/font/local";
 import Head from "next/head";
+import { useRouter } from "next/router";
 
 import Header from "../Header";
 import ScrambleOnHover from "../ScrambleOnHover";
@@ -38,6 +39,8 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const { pathname } = useRouter();
+
   return (
     <div
       className={`${tobias.variable} ${soehne.variable} ${geistMono.variable} flex flex-col text-pretty flex-1 min-h-[100vh] justify-between`}
@@ -61,7 +64,7 @@ export default function RootLayout({
         <main>{children}</main>
       </div>
       <footer className="p-4 pt-0">
-        <Campfire />
+        <Campfire is404={pathname === "/404"} />
         <Mono.Default className="text-center w-full">
           Thanks for stopping by xx
           <br className="sm:hidden" />
