@@ -53,11 +53,24 @@ export default function RootLayout({
         <meta content="image/png" property="og:image:type" />
         <meta content="1238" property="og:image:width" />
         <meta content=" 826" property="og:image:height" />
-
         <link
-          href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💕</text></svg>"
-          rel="icon"
+          href="/apple-touch-icon.png"
+          rel="apple-touch-icon"
+          sizes="180x180"
         />
+        <link
+          href="/favicon-32x32.png"
+          rel="icon"
+          sizes="32x32"
+          type="image/png"
+        />
+        <link
+          href="/favicon-16x16.png"
+          rel="icon"
+          sizes="16x16"
+          type="image/png"
+        />
+        <link href="/site.webmanifest" rel="manifest" />
       </Head>
       <div className="pb-16">
         <Header />
