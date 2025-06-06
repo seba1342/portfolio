@@ -1,0 +1,19 @@
+<xml version="1.0" encoding="UTF-8">
+  <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+    <url>
+      <loc>https://sebastien.bailouni.com</loc>
+      <lastmod>2025-06-01</lastmod>
+    </url>
+    <url>
+      <loc>https://sebastien.bailouni.com/inspiration</loc>
+      <lastmod>2025-06-01</lastmod>
+      <priority>0.8</priority>
+    </url>
+    <url>
+      <loc>https://sebastien.bailouni.com/projects/gratitudes</loc>
+      <lastmod>2025-06-01</lastmod>
+      <priority>0.6</priority>
+    </url>
+
+  </urlset>
+</xml>
