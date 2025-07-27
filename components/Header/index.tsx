@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-
 import ScaleOnHover from "../ScaleOnHover";
 import ScrambleOnHover from "../ScrambleOnHover";
 import { Mono } from "../text";

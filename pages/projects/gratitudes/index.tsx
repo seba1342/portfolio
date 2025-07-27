@@ -1,10 +1,9 @@
+import Image from "next/image";
 import Button from "@/components/Button";
 import FixedBanner from "@/components/FixedBanner";
 import Content from "@/components/Layout/Content";
 import { Body, Mono, Titles } from "@/components/text";
 import * as COLORS from "@/lib/colors";
-import Image from "next/image";
-
 import gratitudesEntryImage from "./assets/gratitudes-entry.png";
 import gratitudesHomeImage from "./assets/gratitudes-home.png";
 

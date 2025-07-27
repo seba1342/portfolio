@@ -1,5 +1,5 @@
-import { useIsSmallDevice } from "@/hooks/useWindowDimensions";
 import { useEffect, useRef, useState } from "react";
+import { useIsSmallDevice } from "@/hooks/useWindowDimensions";
 
 const baseFloor = [
   '\' -.  ""--.....______......-------_________.....-------_________.....----',

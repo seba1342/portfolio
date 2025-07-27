@@ -1,9 +1,9 @@
-import type { InferGetStaticPropsType } from "next";
+import Image from "next/image";
+import Link from "next/link";
 import Content from "@/components/Layout/Content";
 import ScaleOnHover from "@/components/ScaleOnHover";
 import { shuffleArray } from "@/lib/helpers";
-import Image from "next/image";
-import Link from "next/link";
+import type { InferGetStaticPropsType } from "next";
 
 type Inspiration = {
   base_class: string;

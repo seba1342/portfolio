@@ -1,11 +1,9 @@
-import type { Metadata } from "next";
-
 import dynamic from "next/dynamic";
 import { Geist, Geist_Mono } from "next/font/google";
 import localFont from "next/font/local";
 import Head from "next/head";
-
 import Header from "../Header";
+import type { Metadata } from "next";
 
 const Campfire = dynamic(() => import("../Campfire"), { ssr: false });
 

@@ -1,5 +1,4 @@
 import * as COLORS from "@/lib/colors";
-
 import ScaleOnHover from "../ScaleOnHover";
 import ScrambleOnHover from "../ScrambleOnHover";
 import { Mono } from "../text";

@@ -1,9 +1,9 @@
+import Link from "next/link";
 import Content from "@/components/Layout/Content";
 import ScaleOnHover from "@/components/ScaleOnHover";
 import ScrambleOnHover from "@/components/ScrambleOnHover";
 import { Mono, Titles } from "@/components/text";
 import Body from "@/components/text/Body";
-import Link from "next/link";
 
 export default function Custom404() {
   return (

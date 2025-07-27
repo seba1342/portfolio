@@ -6,6 +6,33 @@
     "plugin:import/typescript",
     "plugin:perfectionist/recommended-natural"
   ],
+  "rules": {
+    "import/order": "off",
+    "perfectionist/sort-imports": [
+      "error",
+      {
+        "type": "natural",
+        "order": "asc",
+        "newlines-between": "never",
+        "groups": [
+          "react",
+          "next",
+          "external",
+          "internal",
+          ["parent", "sibling", "index"],
+          "type",
+          "unknown"
+        ],
+        "custom-groups": {
+          "value": {
+            "react": "react",
+            "next": "next"
+          }
+        },
+        "internal-pattern": ["@/**"]
+      }
+    ]
+  },
   "settings": {
     "import/resolver": {
       "typescript": true,

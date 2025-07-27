@@ -1,6 +1,5 @@
 import Image, { StaticImageData } from "next/image";
 import Link from "next/link";
-
 import ScaleOnHover from "../ScaleOnHover";
 import { Body, Titles } from "../text";
 

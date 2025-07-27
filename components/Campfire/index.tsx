@@ -1,7 +1,12 @@
+import React, {
+  CSSProperties,
+  type JSX,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { useIsSmallDevice } from "@/hooks/useWindowDimensions";
 import { oatmeal } from "@/lib/colors";
-import React, { CSSProperties, type JSX, useEffect, useRef, useState } from "react";
-
 import FloorBackground from "./FloorBackground";
 import { applyTaper, clamp, generateFireNoise, rndi } from "./helpers";
 
@@ -84,9 +89,11 @@ function Campfire({ is404 = false }: { is404?: boolean }): JSX.Element {
       observer.observe(containerRef.current);
     }
 
+    const staticContainerRef = containerRef.current;
+
     return () => {
-      if (containerRef.current) {
-        observer.unobserve(containerRef.current);
+      if (staticContainerRef != null) {
+        observer.unobserve(staticContainerRef);
       }
     };
   }, [isInViewport]);

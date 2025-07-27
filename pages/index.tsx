@@ -2,7 +2,6 @@ import Content from "@/components/Layout/Content";
 import Projects from "@/components/Projects";
 import ScrambleOnHover from "@/components/ScrambleOnHover";
 import { Body, Titles } from "@/components/text";
-
 import gratitudesImage from "./projects/gratitudes/assets/gratitudes.png";
 
 export default function Home() {

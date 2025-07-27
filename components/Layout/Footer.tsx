@@ -1,5 +1,4 @@
 import { useRouter } from "next/router";
-
 import Campfire from "../Campfire";
 import ScrambleOnHover from "../ScrambleOnHover";
 import { Mono } from "../text";
