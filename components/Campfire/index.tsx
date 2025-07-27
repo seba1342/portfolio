@@ -1,6 +1,6 @@
 import { useIsSmallDevice } from "@/hooks/useWindowDimensions";
 import { oatmeal } from "@/lib/colors";
-import React, { CSSProperties, useEffect, useRef, useState } from "react";
+import React, { CSSProperties, type JSX, useEffect, useRef, useState } from "react";
 
 import FloorBackground from "./FloorBackground";
 import { applyTaper, clamp, generateFireNoise, rndi } from "./helpers";
