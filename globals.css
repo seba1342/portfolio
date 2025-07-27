@@ -1,9 +1,9 @@
+@import url("components/text/text.css");
+@import url("pages/projects/gratitudes/gratitudes.css");
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
-@import url("components/text/text.css");
-@import url("pages/projects/gratitudes/gratitudes.css");
 
 :root {
   --bark: #341109;

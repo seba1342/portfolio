@@ -2,7 +2,6 @@ import type { InferGetStaticPropsType } from "next";
 
 import Content from "@/components/Layout/Content";
 import ScaleOnHover from "@/components/ScaleOnHover";
-import { Body, Titles } from "@/components/text";
 import { shuffleArray } from "@/lib/helpers";
 import Image from "next/image";
 import Link from "next/link";
@@ -44,7 +43,7 @@ function InspirationItem({ inspiration }: { inspiration: Inspiration }) {
     inspiration.source?.url == null ||
     inspiration.image == null
   )
-    return;
+    return null;
 
   return (
     <Link
