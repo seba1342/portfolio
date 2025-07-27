@@ -11,7 +11,7 @@
   "dependencies": {
     "@vercel/analytics": "^1.2.2",
     "@vercel/speed-insights": "^1.0.10",
-    "gray-matter": "^4.0.3",
+    "geist": "^1.4.2",
     "next": "15.4.4",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",

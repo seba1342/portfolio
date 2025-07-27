@@ -1,6 +1,5 @@
 import type { Config } from "tailwindcss";
-
-const defaultTheme = require("tailwindcss/defaultTheme");
+import defaultTheme from "tailwindcss/defaultTheme";
 
 const config: Config = {
   content: [
@@ -23,7 +22,7 @@ const config: Config = {
       },
       fontFamily: {
         mono: ["var(--font-geist-mono)", ...defaultTheme.fontFamily.mono],
-        sans: ["var(--font-soehne)", ...defaultTheme.fontFamily.sans],
+        sans: ["var(--font-geist)", ...defaultTheme.fontFamily.sans],
         serif: ["var(--font-tobias)", ...defaultTheme.fontFamily.serif],
       },
       lineHeight: {

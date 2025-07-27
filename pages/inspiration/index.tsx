@@ -1,5 +1,4 @@
 import type { InferGetStaticPropsType } from "next";
-
 import Content from "@/components/Layout/Content";
 import ScaleOnHover from "@/components/ScaleOnHover";
 import { shuffleArray } from "@/lib/helpers";

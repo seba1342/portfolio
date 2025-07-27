@@ -13,17 +13,18 @@ export const theme = {
   backgroundColor: "#311730",
 };
 
+
 export default function Gratitudes() {
   return (
     <>
-      <FixedBanner backgroundColor={theme.backgroundColor}>
-        <FixedBanner.Text>
-          Released: 20.10.23 • Platform: iOS & Android • Tech: React Native/Expo
-        </FixedBanner.Text>
-      </FixedBanner>
       <div
-        className={`gratitudes__background flex flex-col justify-center items-center h-full pt-20 pb-8 w-full mt-[92px] relative`}
+        className={`gratitudes__background flex flex-col justify-center items-center h-full pt-36 pb-8 w-full relative`}
       >
+        <FixedBanner backgroundColor={theme.backgroundColor}>
+          <FixedBanner.Text>
+            Released: 20.10.23 • Platform: iOS & Android • Tech: React Native/Expo
+          </FixedBanner.Text>
+        </FixedBanner>
         <Titles.H1 align="center" color="light">
           Gratitudes
         </Titles.H1>
