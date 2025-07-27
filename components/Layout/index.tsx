@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import localFont from "next/font/local";
 import Head from "next/head";
 import Header from "../Header";
+import Footer from "./Footer";
 import type { Metadata } from "next";
 
 const Campfire = dynamic(() => import("../Campfire"), { ssr: false });
@@ -33,7 +34,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html
+    <div
       className={`${tobias.variable} ${geist.variable} ${geistMono.variable} flex flex-col text-pretty flex-1 min-h-[100vh] justify-between`}
       lang="en"
     >
@@ -64,12 +65,12 @@ export default function RootLayout({
         />
         <link href="/site.webmanifest" rel="manifest" />
       </Head>
-      <body>
-        <div className="pb-16">
-          <Header />
-          <main>{children}</main>
-        </div>
-      </body>
-    </html>
+
+      <div className="pb-16">
+        <Header />
+        <main>{children}</main>
+      </div>
+      <Footer />
+    </div>
   );
 }

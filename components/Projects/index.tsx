@@ -5,7 +5,7 @@ import { Body, Titles } from "../text";
 
 function Projects({ children }: { children: React.ReactNode }) {
   return (
-    <div className="grid gap-2 md:gap-4 grid-cols-1 lg:grid-cols-2 my-6">
+    <div className="grid gap-2 md:gap-4 grid-cols-1 md:grid-cols-2 my-6">
       {children}
     </div>
   );
