@@ -12,7 +12,7 @@
     "@vercel/analytics": "^1.2.2",
     "@vercel/speed-insights": "^1.0.10",
     "geist": "^1.4.2",
-    "next": "15.4.4",
+    "next": "15.4.10",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "use-scramble": "^2.2.15"
