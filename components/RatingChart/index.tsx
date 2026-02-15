@@ -26,7 +26,6 @@ export default function RatingChart({
   const containerRef = useRef<HTMLDivElement>(null);
   const hasAnimatedRef = useRef(false);
   const [cells, setCells] = useState<Map<string, string>>(new Map());
-  const [resolvedLabels, setResolvedLabels] = useState<Set<number>>(new Set());
   const [isVisible, setIsVisible] = useState(false);
 
   // IntersectionObserver: trigger animation once
@@ -64,17 +63,6 @@ export default function RatingChart({
       const raw = distribution[rating] ?? 0;
       const scaled = Math.round((raw / maxCount) * MAX_ROWS);
       const colStart = colIndex * COL_STAGGER;
-
-      // Fade in label when column animation completes
-      const colDuration =
-        scaled > 0
-          ? (scaled - 1) * ROW_DELAY + SCRAMBLE_DURATION
-          : SCRAMBLE_DURATION;
-
-      const labelTimeout = setTimeout(() => {
-        setResolvedLabels((prev) => new Set(prev).add(rating));
-      }, colStart + colDuration);
-      timeouts.push(labelTimeout);
 
       if (scaled === 0) return;
 
@@ -117,7 +105,6 @@ export default function RatingChart({
 
   const replay = () => {
     setCells(new Map());
-    setResolvedLabels(new Set());
     setIsVisible(false);
     requestAnimationFrame(() => setIsVisible(true));
   };
@@ -134,9 +121,17 @@ export default function RatingChart({
           gridTemplateColumns: `repeat(${RATINGS.length}, auto)`,
         }}
       >
-        {RATINGS.map((rating) => {
+        {RATINGS.map((rating, colIndex) => {
           const raw = distribution[rating] ?? 0;
           const scaled = Math.round((raw / maxCount) * MAX_ROWS);
+          const COL_STAGGER = 50;
+          const ROW_DELAY = 40;
+          const SCRAMBLE_DURATION = 200;
+          const labelDelay =
+            colIndex * COL_STAGGER +
+            (scaled > 0
+              ? (scaled - 1) * ROW_DELAY + SCRAMBLE_DURATION
+              : SCRAMBLE_DURATION);
           return (
             <div
               className="flex flex-col items-center px-1"
@@ -165,12 +160,16 @@ export default function RatingChart({
                 })}
               </div>
               <span
-                className="text-[6px] md:text-xs mt-1 select-none text-xs transition-all duration-300 ease-out"
+                className="text-[6px] md:text-xs mt-1 select-none text-xs"
                 style={{
-                  opacity: resolvedLabels.has(rating) ? 0.6 : 0,
-                  transform: resolvedLabels.has(rating)
-                    ? "translateY(0)"
-                    : "translateY(4px)",
+                  opacity: 0,
+                  transform: "translateY(4px)",
+                  transition: "opacity 300ms ease-out, transform 300ms ease-out",
+                  transitionDelay: `${labelDelay}ms`,
+                  ...(isVisible && {
+                    opacity: 0.6,
+                    transform: "translateY(0)",
+                  }),
                 }}
               >
                 {rating}
