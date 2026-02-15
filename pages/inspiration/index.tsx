@@ -16,7 +16,7 @@ type Inspiration = {
 
 export async function getStaticProps() {
   const res = await fetch(
-    "https://api.are.na/v2/channels/the-interwebz?per=100"
+    "https://api.are.na/v2/channels/the-interwebz?per=100",
   );
   const data = (await res.json()) as { contents: Inspiration[] };
   const allInspiration = shuffleArray(data.contents);
