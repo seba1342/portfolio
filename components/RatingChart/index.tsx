@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 type RatingDistribution = Record<number, number>;
 
@@ -17,7 +17,11 @@ export default function RatingChart({
 }: {
   distribution: RatingDistribution;
 }) {
-  const maxCount = Math.max(...RATINGS.map((r) => distribution[r] ?? 0), 1);
+  const distributionKey = JSON.stringify(distribution);
+  const maxCount = useMemo(
+    () => Math.max(...RATINGS.map((r) => distribution[r] ?? 0), 1),
+    [distributionKey]
+  );
   const containerRef = useRef<HTMLDivElement>(null);
   const hasAnimatedRef = useRef(false);
   const [cells, setCells] = useState<Map<string, string>>(new Map());
@@ -39,7 +43,7 @@ export default function RatingChart({
     );
 
     observer.observe(el);
-    return () => observer.unobserve(el);
+    return () => observer.disconnect();
   }, []);
 
   // Scramble animation
@@ -103,7 +107,8 @@ export default function RatingChart({
       timeouts.forEach(clearTimeout);
       intervals.forEach(clearInterval);
     };
-  }, [isVisible, distribution]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isVisible, distributionKey]);
 
   return (
     <div
