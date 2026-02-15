@@ -7,10 +7,17 @@ type RatingDistribution = Record<number, number>;
 const RATINGS = [0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5];
 const MAX_ROWS = 10;
 const SCRAMBLE_CHARS = "#@$%&*+=~?!";
+const LABEL_SCRAMBLE_CHARS = "0123456789.";
 const CELL_CHAR = "#";
 
 function getRandomChar(): string {
   return SCRAMBLE_CHARS[Math.floor(Math.random() * SCRAMBLE_CHARS.length)];
+}
+
+function getRandomLabelChar(): string {
+  return LABEL_SCRAMBLE_CHARS[
+    Math.floor(Math.random() * LABEL_SCRAMBLE_CHARS.length)
+  ];
 }
 
 export default function RatingChart({
@@ -62,12 +69,37 @@ export default function RatingChart({
     RATINGS.forEach((rating, colIndex) => {
       const raw = distribution[rating] ?? 0;
       const scaled = Math.round((raw / maxCount) * MAX_ROWS);
+      const colStart = colIndex * COL_STAGGER;
+      const labelKey = `label-${rating}`;
+
+      // Scramble the label for the duration of this column's animation
+      const colDuration = scaled > 0 ? (scaled - 1) * ROW_DELAY + SCRAMBLE_DURATION : SCRAMBLE_DURATION;
+
+      const labelStartTimeout = setTimeout(() => {
+        setCells((prev) => new Map(prev).set(labelKey, getRandomLabelChar()));
+
+        const labelInterval = setInterval(() => {
+          setCells((prev) => {
+            if (prev.get(labelKey) === String(rating)) return prev;
+            return new Map(prev).set(labelKey, getRandomLabelChar());
+          });
+        }, SCRAMBLE_INTERVAL);
+        intervals.push(labelInterval);
+
+        const labelResolveTimeout = setTimeout(() => {
+          clearInterval(labelInterval);
+          setCells((prev) => new Map(prev).set(labelKey, String(rating)));
+        }, colDuration);
+        timeouts.push(labelResolveTimeout);
+      }, colStart);
+      timeouts.push(labelStartTimeout);
+
       if (scaled === 0) return;
 
       // Each row reveals bottom-to-top with stagger
       for (let row = 0; row < scaled; row++) {
         const key = `${rating}-${row}`;
-        const revealDelay = colIndex * COL_STAGGER + row * ROW_DELAY;
+        const revealDelay = colStart + row * ROW_DELAY;
 
         // Reveal this row with a random char
         const revealTimeout = setTimeout(() => {
@@ -118,7 +150,7 @@ export default function RatingChart({
           const scaled = Math.round((raw / maxCount) * MAX_ROWS);
           return (
             <div
-              className="flex flex-col items-center px-2"
+              className="flex flex-col items-center px-1"
               key={rating}
               title={`${rating} stars: ${raw} movie${raw !== 1 ? "s" : ""}`}
             >
@@ -143,8 +175,8 @@ export default function RatingChart({
                   );
                 })}
               </div>
-              <span className="text-[10px] md:text-xs opacity-60 mt-1 select-none">
-                {rating}
+              <span className="text-[6px] md:text-xs opacity-60 mt-1 select-none text-xs">
+                {cells.get(`label-${rating}`) ?? rating}
               </span>
             </div>
           );
