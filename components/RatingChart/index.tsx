@@ -130,7 +130,7 @@ export default function RatingChart({
           const scaled = Math.round((raw / maxCount) * MAX_ROWS);
           return (
             <div
-              className="flex flex-col items-center"
+              className="flex flex-col items-center px-1"
               key={rating}
               title={`${rating} stars: ${raw} movie${raw !== 1 ? "s" : ""}`}
             >
