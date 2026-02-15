@@ -1,7 +1,7 @@
-import dynamic from "next/dynamic";
 import Image from "next/image";
 import Link from "next/link";
 import Content from "@/components/Layout/Content";
+import RatingChart from "@/components/RatingChart";
 import ScrambleOnHover from "@/components/ScrambleOnHover";
 import { Body, Mono } from "@/components/text";
 import {
@@ -12,10 +12,6 @@ import {
   writeBlob,
 } from "@/lib/letterboxd";
 import type { InferGetStaticPropsType } from "next";
-
-const RatingChart = dynamic(() => import("@/components/RatingChart"), {
-  ssr: false,
-});
 
 export async function getStaticProps() {
   const [existing, rss] = await Promise.all([readBlob(), parseRssFeed()]);
@@ -89,7 +85,7 @@ export default function Watching({
   }
 
   return (
-    <Content className="flex flex-col gap-4">
+    <Content className="flex flex-col gap-4 items-center">
       <Mono.Default className="self-end">
         {entries.length} Movies sourced from{" "}
         <Link
