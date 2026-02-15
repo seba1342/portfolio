@@ -17,13 +17,14 @@ export default function Header() {
         </h1>
         <ul className="flex flex-row">
           <Item type="inspiration" />
+          <Item type="watching" />
         </ul>
       </div>
     </nav>
   );
 }
 
-function Item({ type }: { type: "inspiration" }) {
+function Item({ type }: { type: "inspiration" | "watching" }) {
   const pathname = usePathname();
 
   return (
