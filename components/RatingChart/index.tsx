@@ -130,7 +130,7 @@ export default function RatingChart({
           const scaled = Math.round((raw / maxCount) * MAX_ROWS);
           return (
             <div
-              className="flex flex-col items-center px-1"
+              className="flex flex-col items-center px-2"
               key={rating}
               title={`${rating} stars: ${raw} movie${raw !== 1 ? "s" : ""}`}
             >
@@ -143,7 +143,7 @@ export default function RatingChart({
 
                   return (
                     <span
-                      className="text-xs md:text-sm leading-tight select-none"
+                      className="text-xs md:text-sm leading-none select-none"
                       key={i}
                       style={{
                         minWidth: "1ch",
