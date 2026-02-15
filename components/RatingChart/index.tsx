@@ -7,7 +7,7 @@ type RatingDistribution = Record<number, number>;
 const RATINGS = [0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5];
 const MAX_ROWS = 10;
 const SCRAMBLE_CHARS = "#@$%&*+=~?!";
-const CELL_CHAR = "#";
+const RESTING_CHARS = ["#", "@", "$", "%", "&", "*", "+", "="];
 
 function getRandomChar(): string {
   return SCRAMBLE_CHARS[Math.floor(Math.random() * SCRAMBLE_CHARS.length)];
@@ -23,6 +23,21 @@ export default function RatingChart({
     () => Math.max(...RATINGS.map((r) => distribution[r] ?? 0), 1),
     [distributionKey],
   );
+  const restingChars = useMemo(() => {
+    const map = new Map<string, string>();
+    for (const rating of RATINGS) {
+      const count = distribution[rating] ?? 0;
+      const scaled = Math.round((count / maxCount) * MAX_ROWS);
+      for (let row = 0; row < scaled; row++) {
+        map.set(
+          `${rating}-${row}`,
+          RESTING_CHARS[Math.floor(Math.random() * RESTING_CHARS.length)],
+        );
+      }
+    }
+    return map;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [distributionKey]);
   const containerRef = useRef<HTMLDivElement>(null);
   const hasAnimatedRef = useRef(false);
   const [cells, setCells] = useState<Map<string, string>>(new Map());
@@ -54,7 +69,7 @@ export default function RatingChart({
     const COL_STAGGER = 50; // ms between columns starting
     const ROW_DELAY = 40; // ms between rows appearing within a column
     const SCRAMBLE_DURATION_BASE = 150; // ms of scrambling for first row
-    const SCRAMBLE_DURATION_INCREMENT = 30; // extra ms per row
+    const SCRAMBLE_DURATION_INCREMENT = 250; // extra ms per row
     const SCRAMBLE_INTERVAL = 50; // ms between character changes
 
     const timeouts: ReturnType<typeof setTimeout>[] = [];
@@ -77,20 +92,22 @@ export default function RatingChart({
           setCells((prev) => new Map(prev).set(key, getRandomChar()));
 
           // Scramble this cell while it's active
+          const restChar = restingChars.get(key) ?? "#";
           const interval = setInterval(() => {
             setCells((prev) => {
               const val = prev.get(key);
-              if (val === CELL_CHAR) return prev;
+              if (val === restChar) return prev;
               return new Map(prev).set(key, getRandomChar());
             });
           }, SCRAMBLE_INTERVAL);
           intervals.push(interval);
 
           // Resolve to final char (longer scramble for higher rows)
-          const scrambleDuration = SCRAMBLE_DURATION_BASE + row * SCRAMBLE_DURATION_INCREMENT;
+          const scrambleDuration =
+            SCRAMBLE_DURATION_BASE + row * SCRAMBLE_DURATION_INCREMENT;
           const resolveTimeout = setTimeout(() => {
             clearInterval(interval);
-            setCells((prev) => new Map(prev).set(key, CELL_CHAR));
+            setCells((prev) => new Map(prev).set(key, restChar));
           }, scrambleDuration);
           timeouts.push(resolveTimeout);
         }, revealDelay);
