@@ -120,7 +120,7 @@ export default function RatingChart({
       aria-label={`Rating distribution chart showing ${Object.values(distribution).reduce((a, b) => a + b, 0)} movies across star ratings`}
     >
       <div
-        className="grid gap-x-1 md:gap-x-2 items-end"
+        className="grid gap-x-0 items-end"
         style={{
           gridTemplateColumns: `repeat(${RATINGS.length}, 1fr)`,
         }}
