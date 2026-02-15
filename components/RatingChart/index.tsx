@@ -121,9 +121,31 @@ export default function RatingChart({
       <div
         className="inline-grid gap-x-0 items-end"
         style={{
-          gridTemplateColumns: `repeat(${RATINGS.length}, auto)`,
+          gridTemplateColumns: `auto repeat(${RATINGS.length}, auto)`,
         }}
       >
+        {/* Y-axis */}
+        <div className="flex flex-col items-end pr-1">
+          <div className="flex flex-col items-end">
+            {Array.from({ length: MAX_ROWS }, (_, i) => {
+              const row = MAX_ROWS - 1 - i;
+              const value = Math.round((row / (MAX_ROWS - 1)) * maxCount);
+              const showLabel = row === MAX_ROWS - 1 || row === Math.floor(MAX_ROWS / 2) || row === 0;
+              return (
+                <span
+                  className="text-xs md:text-sm leading-none select-none opacity-40"
+                  key={i}
+                  style={{ minWidth: "2ch", textAlign: "right" }}
+                >
+                  {showLabel ? value : "\u00A0"}
+                </span>
+              );
+            })}
+          </div>
+          <span className="text-[6px] md:text-xs mt-1 select-none text-xs opacity-0">
+            {"\u00A0"}
+          </span>
+        </div>
         {RATINGS.map((rating, colIndex) => {
           const raw = distribution[rating] ?? 0;
           const scaled = Math.round((raw / maxCount) * MAX_ROWS);
