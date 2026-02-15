@@ -53,7 +53,8 @@ export default function RatingChart({
 
     const COL_STAGGER = 50; // ms between columns starting
     const ROW_DELAY = 40; // ms between rows appearing within a column
-    const SCRAMBLE_DURATION = 200; // ms of scrambling per row
+    const SCRAMBLE_DURATION_BASE = 150; // ms of scrambling for first row
+    const SCRAMBLE_DURATION_INCREMENT = 30; // extra ms per row
     const SCRAMBLE_INTERVAL = 50; // ms between character changes
 
     const timeouts: ReturnType<typeof setTimeout>[] = [];
@@ -85,11 +86,12 @@ export default function RatingChart({
           }, SCRAMBLE_INTERVAL);
           intervals.push(interval);
 
-          // Resolve to final char
+          // Resolve to final char (longer scramble for higher rows)
+          const scrambleDuration = SCRAMBLE_DURATION_BASE + row * SCRAMBLE_DURATION_INCREMENT;
           const resolveTimeout = setTimeout(() => {
             clearInterval(interval);
             setCells((prev) => new Map(prev).set(key, CELL_CHAR));
-          }, SCRAMBLE_DURATION);
+          }, scrambleDuration);
           timeouts.push(resolveTimeout);
         }, revealDelay);
         timeouts.push(revealTimeout);
@@ -124,7 +126,6 @@ export default function RatingChart({
         {RATINGS.map((rating, colIndex) => {
           const raw = distribution[rating] ?? 0;
           const scaled = Math.round((raw / maxCount) * MAX_ROWS);
-          const labelDelay = colIndex * 50;
           return (
             <div
               className="flex flex-col items-center px-1"
@@ -157,8 +158,9 @@ export default function RatingChart({
                 style={{
                   opacity: 0,
                   transform: "translateY(4px)",
-                  transition: "opacity 300ms ease-out, transform 300ms ease-out",
-                  transitionDelay: `${labelDelay}ms`,
+                  transition:
+                    "opacity 300ms ease-out, transform 300ms ease-out",
+                  transitionDelay: `${colIndex * 50}ms`,
                   ...(isVisible && {
                     opacity: 0.6,
                     transform: "translateY(0)",
