@@ -21,7 +21,7 @@ export default function RatingChart({
   const distributionKey = JSON.stringify(distribution);
   const maxCount = useMemo(
     () => Math.max(...RATINGS.map((r) => distribution[r] ?? 0), 1),
-    [distributionKey]
+    [distributionKey],
   );
   const containerRef = useRef<HTMLDivElement>(null);
   const hasAnimatedRef = useRef(false);
@@ -40,7 +40,7 @@ export default function RatingChart({
           hasAnimatedRef.current = true;
         }
       },
-      { threshold: 0.3 }
+      { threshold: 0.3 },
     );
 
     observer.observe(el);
@@ -110,19 +110,19 @@ export default function RatingChart({
       timeouts.forEach(clearTimeout);
       intervals.forEach(clearInterval);
     };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isVisible, distributionKey]);
 
   return (
     <div
-      ref={containerRef}
-      className="mono w-full"
       aria-label={`Rating distribution chart showing ${Object.values(distribution).reduce((a, b) => a + b, 0)} movies across star ratings`}
+      className="mono"
+      ref={containerRef}
     >
       <div
-        className="grid gap-x-0 items-end"
+        className="inline-grid gap-x-0 items-end"
         style={{
-          gridTemplateColumns: `repeat(${RATINGS.length}, 1fr)`,
+          gridTemplateColumns: `repeat(${RATINGS.length}, auto)`,
         }}
       >
         {RATINGS.map((rating) => {
@@ -130,8 +130,8 @@ export default function RatingChart({
           const scaled = Math.round((raw / maxCount) * MAX_ROWS);
           return (
             <div
-              key={rating}
               className="flex flex-col items-center"
+              key={rating}
               title={`${rating} stars: ${raw} movie${raw !== 1 ? "s" : ""}`}
             >
               <div className="flex flex-col items-center">
@@ -143,8 +143,8 @@ export default function RatingChart({
 
                   return (
                     <span
-                      key={i}
                       className="text-xs md:text-sm leading-tight select-none"
+                      key={i}
                       style={{
                         minWidth: "1ch",
                         textAlign: "center",
