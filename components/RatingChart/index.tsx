@@ -138,7 +138,7 @@ export default function RatingChart({
                         textAlign: "center",
                       }}
                     >
-                      {isFilled && char ? char : " "}
+                      {isFilled && char ? char : "\u00A0"}
                     </span>
                   );
                 })}
