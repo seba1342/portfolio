@@ -124,14 +124,7 @@ export default function RatingChart({
         {RATINGS.map((rating, colIndex) => {
           const raw = distribution[rating] ?? 0;
           const scaled = Math.round((raw / maxCount) * MAX_ROWS);
-          const COL_STAGGER = 50;
-          const ROW_DELAY = 40;
-          const SCRAMBLE_DURATION = 200;
-          const labelDelay =
-            colIndex * COL_STAGGER +
-            (scaled > 0
-              ? (scaled - 1) * ROW_DELAY + SCRAMBLE_DURATION
-              : SCRAMBLE_DURATION);
+          const labelDelay = colIndex * 50;
           return (
             <div
               className="flex flex-col items-center px-1"
