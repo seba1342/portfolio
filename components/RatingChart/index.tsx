@@ -93,8 +93,10 @@ export default function RatingChart({
             clearInterval(interval);
             setCells((prev) => new Map(prev).set(key, CELL_CHAR));
           }, scrambleDuration);
+
           timeouts.push(resolveTimeout);
         }, revealDelay);
+
         timeouts.push(revealTimeout);
       }
     });
@@ -118,24 +120,73 @@ export default function RatingChart({
       className="mono"
       ref={containerRef}
     >
-      <div
-        className="inline-grid gap-x-0 items-end"
-        style={{
+      <div className="relative inline-grid gap-x-0 items-end" style={{
           gridTemplateColumns: `auto repeat(${RATINGS.length}, auto)`,
-        }}
-      >
+        }}>
+        {/* Horizontal grid lines */}
+        <div
+          className="absolute pointer-events-none"
+          style={{
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+          }}
+        >
+          <div className="flex flex-col h-full">
+            {Array.from({ length: MAX_ROWS }, (_, i) => {
+              const row = MAX_ROWS - 1 - i;
+              const showLine =
+                row === MAX_ROWS - 1 ||
+                row === Math.floor(MAX_ROWS / 2) ||
+                row === 0;
+              return (
+                <span
+                  className="text-xs md:text-sm leading-none select-none block overflow-hidden whitespace-nowrap"
+                  key={i}
+                  style={{
+                    maxWidth: isVisible && showLine ? "100%" : "0%",
+                    transition: "max-width 600ms ease-out",
+                    transitionDelay: `${i * 30}ms`,
+                    opacity: 0.15,
+                  }}
+                >
+                  {showLine
+                    ? "- ".repeat(40)
+                    : "\u00A0"}
+                </span>
+              );
+            })}
+          </div>
+        </div>
         {/* Y-axis */}
-        <div className="flex flex-col items-end pr-1">
+        <div className="flex flex-col items-end pr-1 relative z-10">
           <div className="flex flex-col items-end">
             {Array.from({ length: MAX_ROWS }, (_, i) => {
               const row = MAX_ROWS - 1 - i;
               const value = Math.round((row / (MAX_ROWS - 1)) * maxCount);
-              const showLabel = row === MAX_ROWS - 1 || row === Math.floor(MAX_ROWS / 2) || row === 0;
+              const showLabel =
+                row === MAX_ROWS - 1 ||
+                row === Math.floor(MAX_ROWS / 2) ||
+                row === 0;
               return (
                 <span
-                  className="text-xs md:text-sm leading-none select-none opacity-40"
+                  className="text-xs md:text-sm leading-none select-none"
                   key={i}
-                  style={{ minWidth: "2ch", textAlign: "right" }}
+                  style={{
+                    minWidth: "2ch",
+                    textAlign: "right",
+                    opacity: 0,
+                    transform: "translateY(4px)",
+                    transition:
+                      "opacity 300ms ease-out, transform 300ms ease-out",
+                    transitionDelay: `${i * 30}ms`,
+                    ...(isVisible &&
+                      showLabel && {
+                        opacity: 0.4,
+                        transform: "translateY(0)",
+                      }),
+                  }}
                 >
                   {showLabel ? value : "\u00A0"}
                 </span>
@@ -151,7 +202,7 @@ export default function RatingChart({
           const scaled = Math.round((raw / maxCount) * MAX_ROWS);
           return (
             <div
-              className="flex flex-col items-center px-1"
+              className="flex flex-col items-center px-1 relative z-10"
               key={rating}
               title={`${rating} stars: ${raw} movie${raw !== 1 ? "s" : ""}`}
             >
