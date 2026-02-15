@@ -47,24 +47,14 @@ export default function RatingChart({
     return () => observer.disconnect();
   }, []);
 
-  // Scramble animation
+  // Scramble + grow upward animation
   useEffect(() => {
     if (!isVisible) return;
 
-    // Initialize all filled cells with random chars (using scaled heights)
-    const initial = new Map<string, string>();
-    for (const rating of RATINGS) {
-      const raw = distribution[rating] ?? 0;
-      const scaled = Math.round((raw / maxCount) * MAX_ROWS);
-      for (let row = 0; row < scaled; row++) {
-        initial.set(`${rating}-${row}`, getRandomChar());
-      }
-    }
-    setCells(new Map(initial));
-
-    const SCRAMBLE_DURATION = 400;
-    const STAGGER_DELAY = 50;
-    const SCRAMBLE_INTERVAL = 50;
+    const COL_STAGGER = 50; // ms between columns starting
+    const ROW_DELAY = 40; // ms between rows appearing within a column
+    const SCRAMBLE_DURATION = 200; // ms of scrambling per row
+    const SCRAMBLE_INTERVAL = 50; // ms between character changes
 
     const timeouts: ReturnType<typeof setTimeout>[] = [];
     const intervals: ReturnType<typeof setInterval>[] = [];
@@ -74,36 +64,34 @@ export default function RatingChart({
       const scaled = Math.round((raw / maxCount) * MAX_ROWS);
       if (scaled === 0) return;
 
-      const startDelay = colIndex * STAGGER_DELAY;
+      // Each row reveals bottom-to-top with stagger
+      for (let row = 0; row < scaled; row++) {
+        const key = `${rating}-${row}`;
+        const revealDelay = colIndex * COL_STAGGER + row * ROW_DELAY;
 
-      const startTimeout = setTimeout(() => {
-        const interval = setInterval(() => {
-          setCells((prev) => {
-            const next = new Map(prev);
-            for (let row = 0; row < scaled; row++) {
-              const key = `${rating}-${row}`;
-              if (next.get(key) !== CELL_CHAR) {
-                next.set(key, getRandomChar());
-              }
-            }
-            return next;
-          });
-        }, SCRAMBLE_INTERVAL);
-        intervals.push(interval);
+        // Reveal this row with a random char
+        const revealTimeout = setTimeout(() => {
+          setCells((prev) => new Map(prev).set(key, getRandomChar()));
 
-        const resolveTimeout = setTimeout(() => {
-          clearInterval(interval);
-          setCells((prev) => {
-            const next = new Map(prev);
-            for (let row = 0; row < scaled; row++) {
-              next.set(`${rating}-${row}`, CELL_CHAR);
-            }
-            return next;
-          });
-        }, SCRAMBLE_DURATION);
-        timeouts.push(resolveTimeout);
-      }, startDelay);
-      timeouts.push(startTimeout);
+          // Scramble this cell while it's active
+          const interval = setInterval(() => {
+            setCells((prev) => {
+              const val = prev.get(key);
+              if (val === CELL_CHAR) return prev;
+              return new Map(prev).set(key, getRandomChar());
+            });
+          }, SCRAMBLE_INTERVAL);
+          intervals.push(interval);
+
+          // Resolve to final char
+          const resolveTimeout = setTimeout(() => {
+            clearInterval(interval);
+            setCells((prev) => new Map(prev).set(key, CELL_CHAR));
+          }, SCRAMBLE_DURATION);
+          timeouts.push(resolveTimeout);
+        }, revealDelay);
+        timeouts.push(revealTimeout);
+      }
     });
 
     return () => {
@@ -150,7 +138,7 @@ export default function RatingChart({
                         textAlign: "center",
                       }}
                     >
-                      {isFilled && isVisible ? (char ?? " ") : " "}
+                      {isFilled && char ? char : " "}
                     </span>
                   );
                 })}
