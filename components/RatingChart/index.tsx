@@ -133,6 +133,12 @@ export default function RatingChart({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isVisible, distributionKey]);
 
+  const replay = () => {
+    setCells(new Map());
+    setIsVisible(false);
+    requestAnimationFrame(() => setIsVisible(true));
+  };
+
   return (
     <div
       aria-label={`Rating distribution chart showing ${Object.values(distribution).reduce((a, b) => a + b, 0)} movies across star ratings`}
@@ -182,6 +188,13 @@ export default function RatingChart({
           );
         })}
       </div>
+      <button
+        className="text-xs opacity-40 hover:opacity-70 mt-2 cursor-pointer"
+        onClick={replay}
+        type="button"
+      >
+        [replay]
+      </button>
     </div>
   );
 }
