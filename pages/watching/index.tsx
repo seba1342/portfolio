@@ -1,3 +1,4 @@
+import dynamic from "next/dynamic";
 import Image from "next/image";
 import Link from "next/link";
 import Content from "@/components/Layout/Content";
@@ -11,6 +12,10 @@ import {
   writeBlob,
 } from "@/lib/letterboxd";
 import type { InferGetStaticPropsType } from "next";
+
+const RatingChart = dynamic(() => import("@/components/RatingChart"), {
+  ssr: false,
+});
 
 export async function getStaticProps() {
   const [existing, rss] = await Promise.all([readBlob(), parseRssFeed()]);
@@ -75,6 +80,14 @@ function WatchItem({ entry }: { entry: WatchEntry }) {
 export default function Watching({
   entries,
 }: InferGetStaticPropsType<typeof getStaticProps>) {
+  const distribution: Record<number, number> = {};
+  for (const entry of entries) {
+    if (entry.memberRating != null) {
+      distribution[entry.memberRating] =
+        (distribution[entry.memberRating] ?? 0) + 1;
+    }
+  }
+
   return (
     <Content className="flex flex-col gap-4">
       <Mono.Default className="self-end">
@@ -88,6 +101,7 @@ export default function Watching({
           <ScrambleOnHover>letterboxd ↗</ScrambleOnHover>
         </Link>
       </Mono.Default>
+      <RatingChart distribution={distribution} />
       <div className="flex flex-wrap gap-4">
         {entries.map((entry) => (
           <WatchItem entry={entry} key={entry.link} />
