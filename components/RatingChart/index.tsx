@@ -5,6 +5,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 type RatingDistribution = Record<number, number>;
 
 const RATINGS = [0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5];
+const MAX_ROWS = 10;
 const SCRAMBLE_CHARS = "#@$%&*+=~?!";
 const CELL_CHAR = "#";
 
@@ -50,11 +51,12 @@ export default function RatingChart({
   useEffect(() => {
     if (!isVisible) return;
 
-    // Initialize all filled cells with random chars
+    // Initialize all filled cells with random chars (using scaled heights)
     const initial = new Map<string, string>();
     for (const rating of RATINGS) {
-      const count = distribution[rating] ?? 0;
-      for (let row = 0; row < count; row++) {
+      const raw = distribution[rating] ?? 0;
+      const scaled = Math.round((raw / maxCount) * MAX_ROWS);
+      for (let row = 0; row < scaled; row++) {
         initial.set(`${rating}-${row}`, getRandomChar());
       }
     }
@@ -68,8 +70,9 @@ export default function RatingChart({
     const intervals: ReturnType<typeof setInterval>[] = [];
 
     RATINGS.forEach((rating, colIndex) => {
-      const count = distribution[rating] ?? 0;
-      if (count === 0) return;
+      const raw = distribution[rating] ?? 0;
+      const scaled = Math.round((raw / maxCount) * MAX_ROWS);
+      if (scaled === 0) return;
 
       const startDelay = colIndex * STAGGER_DELAY;
 
@@ -77,7 +80,7 @@ export default function RatingChart({
         const interval = setInterval(() => {
           setCells((prev) => {
             const next = new Map(prev);
-            for (let row = 0; row < count; row++) {
+            for (let row = 0; row < scaled; row++) {
               const key = `${rating}-${row}`;
               if (next.get(key) !== CELL_CHAR) {
                 next.set(key, getRandomChar());
@@ -92,7 +95,7 @@ export default function RatingChart({
           clearInterval(interval);
           setCells((prev) => {
             const next = new Map(prev);
-            for (let row = 0; row < count; row++) {
+            for (let row = 0; row < scaled; row++) {
               next.set(`${rating}-${row}`, CELL_CHAR);
             }
             return next;
@@ -123,18 +126,19 @@ export default function RatingChart({
         }}
       >
         {RATINGS.map((rating) => {
-          const count = distribution[rating] ?? 0;
+          const raw = distribution[rating] ?? 0;
+          const scaled = Math.round((raw / maxCount) * MAX_ROWS);
           return (
             <div
               key={rating}
               className="flex flex-col items-center"
-              title={`${rating} stars: ${count} movie${count !== 1 ? "s" : ""}`}
+              title={`${rating} stars: ${raw} movie${raw !== 1 ? "s" : ""}`}
             >
               <div className="flex flex-col items-center">
-                {Array.from({ length: maxCount }, (_, i) => {
-                  const row = maxCount - 1 - i;
+                {Array.from({ length: MAX_ROWS }, (_, i) => {
+                  const row = MAX_ROWS - 1 - i;
                   const key = `${rating}-${row}`;
-                  const isFilled = row < count;
+                  const isFilled = row < scaled;
                   const char = cells.get(key);
 
                   return (
