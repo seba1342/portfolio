@@ -7,7 +7,7 @@ type RatingDistribution = Record<number, number>;
 const RATINGS = [0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5];
 const MAX_ROWS = 10;
 const SCRAMBLE_CHARS = "#@$%&*+=~?!";
-const RESTING_CHARS = ["#", "@", "$", "%", "&", "*", "+", "="];
+const CELL_CHAR = "*";
 
 function getRandomChar(): string {
   return SCRAMBLE_CHARS[Math.floor(Math.random() * SCRAMBLE_CHARS.length)];
@@ -23,21 +23,6 @@ export default function RatingChart({
     () => Math.max(...RATINGS.map((r) => distribution[r] ?? 0), 1),
     [distributionKey],
   );
-  const restingChars = useMemo(() => {
-    const map = new Map<string, string>();
-    for (const rating of RATINGS) {
-      const count = distribution[rating] ?? 0;
-      const scaled = Math.round((count / maxCount) * MAX_ROWS);
-      for (let row = 0; row < scaled; row++) {
-        map.set(
-          `${rating}-${row}`,
-          RESTING_CHARS[Math.floor(Math.random() * RESTING_CHARS.length)],
-        );
-      }
-    }
-    return map;
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [distributionKey]);
   const containerRef = useRef<HTMLDivElement>(null);
   const hasAnimatedRef = useRef(false);
   const [cells, setCells] = useState<Map<string, string>>(new Map());
@@ -92,11 +77,10 @@ export default function RatingChart({
           setCells((prev) => new Map(prev).set(key, getRandomChar()));
 
           // Scramble this cell while it's active
-          const restChar = restingChars.get(key) ?? "#";
           const interval = setInterval(() => {
             setCells((prev) => {
               const val = prev.get(key);
-              if (val === restChar) return prev;
+              if (val === CELL_CHAR) return prev;
               return new Map(prev).set(key, getRandomChar());
             });
           }, SCRAMBLE_INTERVAL);
@@ -107,7 +91,7 @@ export default function RatingChart({
             SCRAMBLE_DURATION_BASE + row * SCRAMBLE_DURATION_INCREMENT;
           const resolveTimeout = setTimeout(() => {
             clearInterval(interval);
-            setCells((prev) => new Map(prev).set(key, restChar));
+            setCells((prev) => new Map(prev).set(key, CELL_CHAR));
           }, scrambleDuration);
           timeouts.push(resolveTimeout);
         }, revealDelay);
