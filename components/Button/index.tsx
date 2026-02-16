@@ -19,6 +19,7 @@ export default function Button({
       <a
         className="flex flex-1 items-center justify-center py-4 px-2 rounded-lg w-full min-w-[180px]"
         href={href}
+        rel="noopener noreferrer"
         style={{ backgroundColor }}
         target="_blank"
       >
