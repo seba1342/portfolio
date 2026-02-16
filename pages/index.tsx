@@ -2,8 +2,8 @@ import Content from "@/components/Layout/Content";
 import Projects from "@/components/Projects";
 import ScrambleOnHover from "@/components/ScrambleOnHover";
 import { Body, Titles } from "@/components/text";
-import gratitudesImage from "./projects/gratitudes/assets/gratitudes.png";
 import flightTrackerImage from "./projects/flight-tracker/assets/flight-tracker.svg";
+import gratitudesImage from "./projects/gratitudes/assets/gratitudes.png";
 
 export default function Home() {
   return (
