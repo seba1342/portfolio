@@ -1,5 +1,6 @@
 @import url("components/text/text.css");
 @import url("pages/projects/gratitudes/gratitudes.css");
+@import url("pages/projects/flight-tracker/flight-tracker.css");
 
 @tailwind base;
 @tailwind components;

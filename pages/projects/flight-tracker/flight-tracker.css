@@ -1,0 +1,20 @@
+.flight-tracker__background {
+  background: radial-gradient(
+    77.37% 50% at 50% 100%,
+    #2d5f8a 0%,
+    #1f4a6e 72.87%,
+    #1a3a5c 100%
+  );
+  animation: flight-tracker-breathe 5s infinite alternate;
+}
+
+@keyframes flight-tracker-breathe {
+  0% {
+    background-size: 100% 100%;
+    background-position: 50% 100%;
+  }
+  100% {
+    background-size: 150% 150%;
+    background-position: 50% 70%;
+  }
+}
