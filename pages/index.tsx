@@ -3,6 +3,7 @@ import Projects from "@/components/Projects";
 import ScrambleOnHover from "@/components/ScrambleOnHover";
 import { Body, Titles } from "@/components/text";
 import gratitudesImage from "./projects/gratitudes/assets/gratitudes.png";
+import flightTrackerImage from "./projects/flight-tracker/assets/flight-tracker.svg";
 
 export default function Home() {
   return (
@@ -42,6 +43,13 @@ export default function Home() {
           image={gratitudesImage}
           subtitle="A daily journalling app."
           title="Gratitudes"
+        />
+        <Projects.Project
+          backgroundClass="flight-tracker__background"
+          href="/projects/flight-tracker"
+          image={flightTrackerImage}
+          subtitle="Your eyes in the sky."
+          title="Flight Tracker"
         />
       </Projects>
     </Content>
