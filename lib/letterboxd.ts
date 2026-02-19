@@ -89,8 +89,9 @@ export function mergeEntries(
   const map = new Map<string, WatchEntry>();
   for (const entry of existing) map.set(key(entry), entry);
   for (const entry of incoming) map.set(key(entry), entry);
-  return Array.from(map.values()).sort(
-    (a, b) =>
-      new Date(b.watchedDate).getTime() - new Date(a.watchedDate).getTime(),
-  );
+  return Array.from(map.values()).sort((a, b) => {
+    const ta = new Date(a.watchedDate).getTime() || 0;
+    const tb = new Date(b.watchedDate).getTime() || 0;
+    return tb - ta;
+  });
 }
