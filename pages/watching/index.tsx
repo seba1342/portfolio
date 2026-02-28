@@ -86,18 +86,20 @@ export default function Watching({
 
   return (
     <Content className="flex flex-col gap-4 items-center">
-      <Mono.Default className="self-end">
-        {entries.length} Movies sourced from{" "}
-        <Link
-          className="underline"
-          href="https://letterboxd.com/seba1342/"
-          rel="noopener noreferrer"
-          target="_blank"
-        >
-          <ScrambleOnHover>letterboxd ↗</ScrambleOnHover>
-        </Link>
-      </Mono.Default>
-      <RatingChart distribution={distribution} />
+      <div className="flex flex-col items-center gap-2">
+        <RatingChart distribution={distribution} />
+        <Mono.Default className="opacity-60">
+          {entries.length} Movies sourced from{" "}
+          <Link
+            className="underline"
+            href="https://letterboxd.com/seba1342/"
+            rel="noopener noreferrer"
+            target="_blank"
+          >
+            <ScrambleOnHover>letterboxd ↗</ScrambleOnHover>
+          </Link>
+        </Mono.Default>
+      </div>
       <div className="flex flex-wrap gap-4">
         {entries.map((entry) => (
           <WatchItem entry={entry} key={entry.link} />

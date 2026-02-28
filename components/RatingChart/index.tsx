@@ -5,13 +5,26 @@ import { useEffect, useMemo, useRef, useState } from "react";
 type RatingDistribution = Record<number, number>;
 
 const RATINGS = [0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5];
-const MAX_ROWS = 10;
-const SCRAMBLE_CHARS = "#@$%&*+=~?!";
+const MAX_ROWS = 15;
+const SCRAMBLE_CHARS = "*~-=+:^·×°•";
 const CELL_CHAR = "*";
+const CELL_WIDTH = 4;
 
-function getRandomChar(): string {
-  return SCRAMBLE_CHARS[Math.floor(Math.random() * SCRAMBLE_CHARS.length)];
+// Animation timing
+const COL_STAGGER = 50; // ms between columns starting
+const ROW_DELAY = 33; // ms between rows appearing within a column
+const SCRAMBLE_DURATION_BASE = 750; // ms of scrambling for first row
+const SCRAMBLE_DURATION_INCREMENT = 33; // extra ms per row
+const SCRAMBLE_INTERVAL = 50; // ms between character changes
+
+function getRandomChars(): string {
+  return Array.from(
+    { length: CELL_WIDTH },
+    () => SCRAMBLE_CHARS[Math.floor(Math.random() * SCRAMBLE_CHARS.length)],
+  ).join("");
 }
+
+const RESTING_CHARS = CELL_CHAR.repeat(CELL_WIDTH);
 
 export default function RatingChart({
   distribution,
@@ -21,12 +34,16 @@ export default function RatingChart({
   const distributionKey = JSON.stringify(distribution);
   const maxCount = useMemo(
     () => Math.max(...RATINGS.map((r) => distribution[r] ?? 0), 1),
+    // distributionKey is a stringified version of distribution.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [distributionKey],
   );
   const containerRef = useRef<HTMLDivElement>(null);
   const hasAnimatedRef = useRef(false);
   const [cells, setCells] = useState<Map<string, string>>(new Map());
   const [isVisible, setIsVisible] = useState(false);
+  const [animKey, setAnimKey] = useState(0);
+  const [completedCols, setCompletedCols] = useState<Set<number>>(new Set());
 
   // IntersectionObserver: trigger animation once
   useEffect(() => {
@@ -51,21 +68,24 @@ export default function RatingChart({
   useEffect(() => {
     if (!isVisible) return;
 
-    const COL_STAGGER = 50; // ms between columns starting
-    const ROW_DELAY = 40; // ms between rows appearing within a column
-    const SCRAMBLE_DURATION_BASE = 150; // ms of scrambling for first row
-    const SCRAMBLE_DURATION_INCREMENT = 250; // extra ms per row
-    const SCRAMBLE_INTERVAL = 50; // ms between character changes
-
     const timeouts: ReturnType<typeof setTimeout>[] = [];
     const intervals: ReturnType<typeof setInterval>[] = [];
 
     RATINGS.forEach((rating, colIndex) => {
       const raw = distribution[rating] ?? 0;
-      const scaled = Math.round((raw / maxCount) * MAX_ROWS);
+      const scaled =
+        raw > 0 ? Math.max(1, Math.round((raw / maxCount) * MAX_ROWS)) : 0;
       const colStart = colIndex * COL_STAGGER;
 
       if (scaled === 0) return;
+
+      // Mark column complete when top cell is revealed
+      const topRow = scaled - 1;
+      const topRevealDelay = colStart + topRow * ROW_DELAY;
+      const colDoneTimeout = setTimeout(() => {
+        setCompletedCols((prev) => new Set(prev).add(colIndex));
+      }, topRevealDelay);
+      timeouts.push(colDoneTimeout);
 
       // Each row reveals bottom-to-top with stagger
       for (let row = 0; row < scaled; row++) {
@@ -74,24 +94,24 @@ export default function RatingChart({
 
         // Reveal this row with a random char
         const revealTimeout = setTimeout(() => {
-          setCells((prev) => new Map(prev).set(key, getRandomChar()));
+          setCells((prev) => new Map(prev).set(key, getRandomChars()));
 
           // Scramble this cell while it's active
           const interval = setInterval(() => {
             setCells((prev) => {
               const val = prev.get(key);
-              if (val === CELL_CHAR) return prev;
-              return new Map(prev).set(key, getRandomChar());
+              if (val === RESTING_CHARS) return prev;
+              return new Map(prev).set(key, getRandomChars());
             });
           }, SCRAMBLE_INTERVAL);
           intervals.push(interval);
 
-          // Resolve to final char (longer scramble for higher rows)
+          // Resolve to final chars (longer scramble for higher rows)
           const scrambleDuration =
             SCRAMBLE_DURATION_BASE + row * SCRAMBLE_DURATION_INCREMENT;
           const resolveTimeout = setTimeout(() => {
             clearInterval(interval);
-            setCells((prev) => new Map(prev).set(key, CELL_CHAR));
+            setCells((prev) => new Map(prev).set(key, RESTING_CHARS));
           }, scrambleDuration);
 
           timeouts.push(resolveTimeout);
@@ -110,8 +130,12 @@ export default function RatingChart({
 
   const replay = () => {
     setCells(new Map());
+    setCompletedCols(new Set());
     setIsVisible(false);
-    requestAnimationFrame(() => setIsVisible(true));
+    setAnimKey((k) => k + 1);
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => setIsVisible(true));
+    });
   };
 
   return (
@@ -120,86 +144,17 @@ export default function RatingChart({
       className="mono"
       ref={containerRef}
     >
-      <div className="relative inline-grid gap-x-0 items-end" style={{
-          gridTemplateColumns: `auto repeat(${RATINGS.length}, auto)`,
-        }}>
-        {/* Horizontal grid lines */}
-        <div
-          className="absolute pointer-events-none"
-          style={{
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-          }}
-        >
-          <div className="flex flex-col h-full">
-            {Array.from({ length: MAX_ROWS }, (_, i) => {
-              const row = MAX_ROWS - 1 - i;
-              const showLine =
-                row === MAX_ROWS - 1 ||
-                row === Math.floor(MAX_ROWS / 2) ||
-                row === 0;
-              return (
-                <span
-                  className="text-xs md:text-sm leading-none select-none block overflow-hidden whitespace-nowrap"
-                  key={i}
-                  style={{
-                    maxWidth: isVisible && showLine ? "100%" : "0%",
-                    transition: "max-width 600ms ease-out",
-                    transitionDelay: `${i * 30}ms`,
-                    opacity: 0.15,
-                  }}
-                >
-                  {showLine
-                    ? "- ".repeat(40)
-                    : "\u00A0"}
-                </span>
-              );
-            })}
-          </div>
-        </div>
-        {/* Y-axis */}
-        <div className="flex flex-col items-end pr-1 relative z-10">
-          <div className="flex flex-col items-end">
-            {Array.from({ length: MAX_ROWS }, (_, i) => {
-              const row = MAX_ROWS - 1 - i;
-              const value = Math.round((row / (MAX_ROWS - 1)) * maxCount);
-              const showLabel =
-                row === MAX_ROWS - 1 ||
-                row === Math.floor(MAX_ROWS / 2) ||
-                row === 0;
-              return (
-                <span
-                  className="text-xs md:text-sm leading-none select-none"
-                  key={i}
-                  style={{
-                    minWidth: "2ch",
-                    textAlign: "right",
-                    opacity: 0,
-                    transform: "translateY(4px)",
-                    transition:
-                      "opacity 300ms ease-out, transform 300ms ease-out",
-                    transitionDelay: `${i * 30}ms`,
-                    ...(isVisible &&
-                      showLabel && {
-                        opacity: 0.4,
-                        transform: "translateY(0)",
-                      }),
-                  }}
-                >
-                  {showLabel ? value : "\u00A0"}
-                </span>
-              );
-            })}
-          </div>
-          <span className="text-[6px] md:text-xs mt-1 select-none text-xs opacity-0">
-            {"\u00A0"}
-          </span>
-        </div>
+      <div
+        className="relative inline-grid gap-x-0 items-end"
+        key={animKey}
+        style={{
+          gridTemplateColumns: `repeat(${RATINGS.length}, auto)`,
+        }}
+      >
         {RATINGS.map((rating, colIndex) => {
           const raw = distribution[rating] ?? 0;
-          const scaled = Math.round((raw / maxCount) * MAX_ROWS);
+          const scaled =
+            raw > 0 ? Math.max(1, Math.round((raw / maxCount) * MAX_ROWS)) : 0;
           return (
             <div
               className="flex flex-col items-center px-1 relative z-10"
@@ -212,35 +167,33 @@ export default function RatingChart({
                   const key = `${rating}-${row}`;
                   const isFilled = row < scaled;
                   const char = cells.get(key);
+                  const isTopOfBar = row === scaled - 1;
 
                   return (
                     <span
-                      className="text-xs md:text-sm leading-none select-none"
+                      className="text-xs md:text-sm select-none relative min-w-[4ch] text-center"
                       key={i}
-                      style={{
-                        minWidth: "1ch",
-                        textAlign: "center",
-                      }}
+                      style={{ lineHeight: 0.8 }}
                     >
+                      {isTopOfBar && (
+                        <span
+                          className="absolute left-0 right-0 bottom-full text-center select-none mb-1 text-xs transition-[opacity,transform] ease-out duration-300 delay-150"
+                          style={{
+                            opacity: completedCols.has(colIndex) ? 0.4 : 0,
+                            transform: completedCols.has(colIndex)
+                              ? "translateY(0)"
+                              : "translateY(4px)",
+                          }}
+                        >
+                          {raw}
+                        </span>
+                      )}
                       {isFilled && char ? char : "\u00A0"}
                     </span>
                   );
                 })}
               </div>
-              <span
-                className="text-[6px] md:text-xs mt-1 select-none text-xs"
-                style={{
-                  opacity: 0,
-                  transform: "translateY(4px)",
-                  transition:
-                    "opacity 300ms ease-out, transform 300ms ease-out",
-                  transitionDelay: `${colIndex * 50}ms`,
-                  ...(isVisible && {
-                    opacity: 0.6,
-                    transform: "translateY(0)",
-                  }),
-                }}
-              >
+              <span className="text-xs md:text-sm select-none opacity-40">
                 {rating}
               </span>
             </div>
