@@ -11,6 +11,10 @@
   --oatmeal: #f3d6af;
 }
 
+html {
+  scrollbar-gutter: stable;
+}
+
 body {
   color: var(--bark);
   background: var(--oatmeal);

@@ -1,6 +1,8 @@
+import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import Content from "@/components/Layout/Content";
+import RatingChart from "@/components/RatingChart";
 import ScrambleOnHover from "@/components/ScrambleOnHover";
 import { Body, Mono } from "@/components/text";
 import {
@@ -65,7 +67,9 @@ function WatchItem({ entry }: { entry: WatchEntry }) {
               {entry.memberRating} stars
             </Mono.Default>
           )}
-          {entry.review && <Mono.Default>{entry.review}</Mono.Default>}
+          {entry.review && (
+            <Mono.Default className="opacity-80">{entry.review}</Mono.Default>
+          )}
         </div>
       </Link>
     </div>
@@ -75,24 +79,62 @@ function WatchItem({ entry }: { entry: WatchEntry }) {
 export default function Watching({
   entries,
 }: InferGetStaticPropsType<typeof getStaticProps>) {
+  const [selectedRating, setSelectedRating] = useState<null | number>(null);
+
+  const distribution: Record<number, number> = {};
+  for (const entry of entries) {
+    if (entry.memberRating != null) {
+      distribution[entry.memberRating] =
+        (distribution[entry.memberRating] ?? 0) + 1;
+    }
+  }
+
+  const filteredEntries =
+    selectedRating != null
+      ? entries.filter((e) => e.memberRating === selectedRating)
+      : entries;
+
   return (
-    <Content className="flex flex-col gap-4">
-      <Mono.Default className="self-end">
-        {entries.length} Movies sourced from{" "}
-        <Link
-          className="underline"
-          href="https://letterboxd.com/seba1342/"
-          rel="noopener noreferrer"
-          target="_blank"
-        >
-          <ScrambleOnHover>letterboxd ↗</ScrambleOnHover>
-        </Link>
-      </Mono.Default>
-      <div className="flex flex-wrap gap-4">
-        {entries.map((entry) => (
-          <WatchItem entry={entry} key={entry.link} />
-        ))}
+    <Content className="flex flex-col gap-4 items-center">
+      <div className="flex flex-col items-center gap-4">
+        <RatingChart
+          distribution={distribution}
+          onSelectRating={setSelectedRating}
+          selectedRating={selectedRating}
+        />
+        <Mono.Default className="text-center text-xs">
+          {entries.length} movie ratings, sourced from{" "}
+          <Link
+            className="underline"
+            href="https://letterboxd.com/seba1342/"
+            rel="noopener noreferrer"
+            target="_blank"
+          >
+            <ScrambleOnHover>letterboxd ↗</ScrambleOnHover>
+          </Link>
+        </Mono.Default>
       </div>
+      {filteredEntries.length > 0 ? (
+        <div className="flex flex-wrap gap-4 w-full">
+          {filteredEntries.map((entry) => (
+            <WatchItem entry={entry} key={entry.link} />
+          ))}
+        </div>
+      ) : (
+        <div className="flex items-center justify-center w-full min-h-[400px]">
+          <Body.Small>
+            No films rated {selectedRating} stars,{" "}
+            <button
+              className="underline cursor-pointer"
+              onClick={() => setSelectedRating(null)}
+              type="button"
+            >
+              click here to reset filters
+            </button>
+            .
+          </Body.Small>
+        </div>
+      )}
     </Content>
   );
 }
