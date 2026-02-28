@@ -28,8 +28,12 @@ const RESTING_CHARS = CELL_CHAR.repeat(CELL_WIDTH);
 
 export default function RatingChart({
   distribution,
+  onSelectRating,
+  selectedRating,
 }: {
   distribution: RatingDistribution;
+  onSelectRating?: (rating: null | number) => void;
+  selectedRating?: null | number;
 }) {
   const distributionKey = JSON.stringify(distribution);
   const maxCount = useMemo(
@@ -141,7 +145,8 @@ export default function RatingChart({
   return (
     <div
       aria-label={`Rating distribution chart showing ${Object.values(distribution).reduce((a, b) => a + b, 0)} movies across star ratings`}
-      className="mono"
+      className="mono cursor-pointer"
+      onClick={() => onSelectRating?.(null)}
       ref={containerRef}
     >
       <div
@@ -157,8 +162,16 @@ export default function RatingChart({
             raw > 0 ? Math.max(1, Math.round((raw / maxCount) * MAX_ROWS)) : 0;
           return (
             <div
-              className="flex flex-col items-center px-1 relative z-10"
+              className="flex flex-col items-center px-1 relative z-10 transition-[opacity,transform] duration-200"
               key={rating}
+              onClick={(e) => {
+                e.stopPropagation();
+                onSelectRating?.(rating);
+              }}
+              style={{
+                opacity:
+                  selectedRating != null && selectedRating !== rating ? 0.3 : 1,
+              }}
               title={`${rating} stars: ${raw} movie${raw !== 1 ? "s" : ""}`}
             >
               <div className="flex flex-col items-center">

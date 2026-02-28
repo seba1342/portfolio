@@ -1,3 +1,4 @@
+import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import Content from "@/components/Layout/Content";
@@ -76,6 +77,8 @@ function WatchItem({ entry }: { entry: WatchEntry }) {
 export default function Watching({
   entries,
 }: InferGetStaticPropsType<typeof getStaticProps>) {
+  const [selectedRating, setSelectedRating] = useState<null | number>(null);
+
   const distribution: Record<number, number> = {};
   for (const entry of entries) {
     if (entry.memberRating != null) {
@@ -84,10 +87,19 @@ export default function Watching({
     }
   }
 
+  const filteredEntries =
+    selectedRating != null
+      ? entries.filter((e) => e.memberRating === selectedRating)
+      : entries;
+
   return (
     <Content className="flex flex-col gap-4 items-center">
       <div className="flex flex-col items-center gap-2">
-        <RatingChart distribution={distribution} />
+        <RatingChart
+          distribution={distribution}
+          onSelectRating={setSelectedRating}
+          selectedRating={selectedRating}
+        />
         <Mono.Default className="opacity-60">
           {entries.length} Movies sourced from{" "}
           <Link
@@ -100,11 +112,27 @@ export default function Watching({
           </Link>
         </Mono.Default>
       </div>
-      <div className="flex flex-wrap gap-4">
-        {entries.map((entry) => (
-          <WatchItem entry={entry} key={entry.link} />
-        ))}
-      </div>
+      {filteredEntries.length > 0 ? (
+        <div className="flex flex-wrap gap-4 w-full">
+          {filteredEntries.map((entry) => (
+            <WatchItem entry={entry} key={entry.link} />
+          ))}
+        </div>
+      ) : (
+        <div className="flex items-center justify-center w-full min-h-[400px]">
+          <Body.Small>
+            No films rated {selectedRating} stars,{" "}
+            <button
+              className="underline cursor-pointer"
+              onClick={() => setSelectedRating(null)}
+              type="button"
+            >
+              click here to reset filters
+            </button>
+            .
+          </Body.Small>
+        </div>
+      )}
     </Content>
   );
 }
