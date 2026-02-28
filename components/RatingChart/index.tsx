@@ -46,7 +46,6 @@ export default function RatingChart({
   const hasAnimatedRef = useRef(false);
   const [cells, setCells] = useState<Map<string, string>>(new Map());
   const [isVisible, setIsVisible] = useState(false);
-  const [animKey, setAnimKey] = useState(0);
   const [completedCols, setCompletedCols] = useState<Set<number>>(new Set());
 
   // IntersectionObserver: trigger animation once
@@ -132,15 +131,6 @@ export default function RatingChart({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isVisible, distributionKey]);
 
-  const replay = () => {
-    setCells(new Map());
-    setCompletedCols(new Set());
-    setIsVisible(false);
-    setAnimKey((k) => k + 1);
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => setIsVisible(true));
-    });
-  };
 
   return (
     <div
@@ -151,7 +141,6 @@ export default function RatingChart({
     >
       <div
         className="relative inline-grid gap-x-0 items-end"
-        key={animKey}
         style={{
           gridTemplateColumns: `repeat(${RATINGS.length}, auto)`,
         }}
@@ -166,7 +155,7 @@ export default function RatingChart({
               key={rating}
               onClick={(e) => {
                 e.stopPropagation();
-                onSelectRating?.(rating);
+                onSelectRating?.(selectedRating === rating ? null : rating);
               }}
               style={{
                 opacity:
@@ -213,13 +202,6 @@ export default function RatingChart({
           );
         })}
       </div>
-      <button
-        className="text-xs opacity-40 hover:opacity-70 mt-2 cursor-pointer"
-        onClick={replay}
-        type="button"
-      >
-        [replay]
-      </button>
     </div>
   );
 }
