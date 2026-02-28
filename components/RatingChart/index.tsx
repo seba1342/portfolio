@@ -140,7 +140,7 @@ export default function RatingChart({
       ref={containerRef}
     >
       <div
-        className="relative inline-grid gap-x-0 items-end"
+        className="group relative inline-grid gap-x-0 items-end"
         style={{
           gridTemplateColumns: `repeat(${RATINGS.length}, auto)`,
         }}
@@ -151,15 +151,16 @@ export default function RatingChart({
             raw > 0 ? Math.max(1, Math.round((raw / maxCount) * MAX_ROWS)) : 0;
           return (
             <div
-              className="flex flex-col items-center px-1 relative z-10 transition-[opacity,transform] duration-200"
+              className="flex flex-col items-center px-1 relative z-10 transition-[opacity,transform] duration-200 group-hover:opacity-60 hover:!opacity-100"
               key={rating}
               onClick={(e) => {
                 e.stopPropagation();
                 onSelectRating?.(selectedRating === rating ? null : rating);
               }}
               style={{
-                opacity:
-                  selectedRating != null && selectedRating !== rating ? 0.3 : 1,
+                ...(selectedRating != null && {
+                  opacity: selectedRating === rating ? 1 : 0.3,
+                }),
               }}
               title={`${rating} stars: ${raw} movie${raw !== 1 ? "s" : ""}`}
             >
