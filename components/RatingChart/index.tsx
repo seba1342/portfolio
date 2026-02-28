@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import { Mono } from "../text";
 
 type RatingDistribution = Record<number, number>;
 
@@ -131,7 +132,6 @@ export default function RatingChart({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isVisible, distributionKey]);
 
-
   return (
     <div
       aria-label={`Rating distribution chart showing ${Object.values(distribution).reduce((a, b) => a + b, 0)} movies across star ratings`}
@@ -173,7 +173,7 @@ export default function RatingChart({
 
                   return (
                     <span
-                      className="text-xs md:text-sm select-none relative min-w-[4ch] text-center"
+                      className="text-xs select-none relative min-w-[4ch] text-center"
                       key={i}
                       style={{ lineHeight: 0.8 }}
                     >
@@ -195,13 +195,16 @@ export default function RatingChart({
                   );
                 })}
               </div>
-              <span className="text-xs md:text-sm select-none opacity-40">
-                {rating}
-              </span>
+              <span className="text-xs select-none opacity-40">{rating}</span>
             </div>
           );
         })}
       </div>
+      <Mono.Default className="pt-1 opacity-60 text-xs text-center">
+        {selectedRating != null
+          ? `Filtering by: ${selectedRating} star movies`
+          : "Tap on a column above to filter by that rating."}
+      </Mono.Default>
     </div>
   );
 }

@@ -67,7 +67,9 @@ function WatchItem({ entry }: { entry: WatchEntry }) {
               {entry.memberRating} stars
             </Mono.Default>
           )}
-          {entry.review && <Mono.Default>{entry.review}</Mono.Default>}
+          {entry.review && (
+            <Mono.Default className="opacity-80">{entry.review}</Mono.Default>
+          )}
         </div>
       </Link>
     </div>
@@ -94,28 +96,23 @@ export default function Watching({
 
   return (
     <Content className="flex flex-col gap-4 items-center">
-      <div className="flex flex-col items-center gap-1">
+      <div className="flex flex-col items-center gap-4">
         <RatingChart
           distribution={distribution}
           onSelectRating={setSelectedRating}
           selectedRating={selectedRating}
         />
-        <div className="flex flex-col gap-8 items-center">
-          <Mono.Default className="opacity-60 text-xs text-center">
-            Tap on a column above to filter by that rating.
-          </Mono.Default>
-          <Mono.Default className="text-center text-xs">
-            {entries.length} Movies sourced from{" "}
-            <Link
-              className="underline"
-              href="https://letterboxd.com/seba1342/"
-              rel="noopener noreferrer"
-              target="_blank"
-            >
-              <ScrambleOnHover>letterboxd ↗</ScrambleOnHover>
-            </Link>
-          </Mono.Default>
-        </div>
+        <Mono.Default className="text-center text-xs">
+          {entries.length} movie ratings, sourced from{" "}
+          <Link
+            className="underline"
+            href="https://letterboxd.com/seba1342/"
+            rel="noopener noreferrer"
+            target="_blank"
+          >
+            <ScrambleOnHover>letterboxd ↗</ScrambleOnHover>
+          </Link>
+        </Mono.Default>
       </div>
       {filteredEntries.length > 0 ? (
         <div className="flex flex-wrap gap-4 w-full">
