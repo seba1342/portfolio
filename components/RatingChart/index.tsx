@@ -151,7 +151,7 @@ export default function RatingChart({
             raw > 0 ? Math.max(1, Math.round((raw / maxCount) * MAX_ROWS)) : 0;
           return (
             <div
-              className="flex flex-col items-center px-1 relative z-10 transition-[opacity,transform] duration-200 group-hover:opacity-60 hover:!opacity-100"
+              className="flex flex-col items-center px-1 relative z-10 transition-[opacity,transform] duration-200 md:group-hover:opacity-60 md:hover:!opacity-100"
               key={rating}
               onClick={(e) => {
                 e.stopPropagation();
