@@ -295,7 +295,17 @@ function createNoiseTexture(gl: WebGL2RenderingContext): WebGLTexture {
   }
   const texture = gl.createTexture()!;
   gl.bindTexture(gl.TEXTURE_2D, texture);
-  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, size, size, 0, gl.RGBA, gl.UNSIGNED_BYTE, data);
+  gl.texImage2D(
+    gl.TEXTURE_2D,
+    0,
+    gl.RGBA,
+    size,
+    size,
+    0,
+    gl.RGBA,
+    gl.UNSIGNED_BYTE,
+    data,
+  );
   gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
   gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
   gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT);
@@ -332,7 +342,11 @@ export default function VolumetricClouds({
     const gl = canvas.getContext("webgl2");
     if (!gl) return;
 
-    const cloudsProgram = createProgram(gl, vertexShaderSource, cloudsFragSource);
+    const cloudsProgram = createProgram(
+      gl,
+      vertexShaderSource,
+      cloudsFragSource,
+    );
     const cloudsU = {
       camDistance: gl.getUniformLocation(cloudsProgram, "u_camDistance"),
       camElevation: gl.getUniformLocation(cloudsProgram, "u_camElevation"),
@@ -366,7 +380,11 @@ export default function VolumetricClouds({
 
     const quadBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, quadBuffer);
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 1, -1, -1, 1, 1, 1]), gl.STATIC_DRAW);
+    gl.bufferData(
+      gl.ARRAY_BUFFER,
+      new Float32Array([-1, -1, 1, -1, -1, 1, 1, 1]),
+      gl.STATIC_DRAW,
+    );
     const quadVAO = gl.createVertexArray();
     gl.bindVertexArray(quadVAO);
     const posLoc = gl.getAttribLocation(cloudsProgram, "a_position");
@@ -387,7 +405,17 @@ export default function VolumetricClouds({
 
       sceneTex = gl!.createTexture();
       gl!.bindTexture(gl!.TEXTURE_2D, sceneTex);
-      gl!.texImage2D(gl!.TEXTURE_2D, 0, gl!.RGBA, width, height, 0, gl!.RGBA, gl!.UNSIGNED_BYTE, null);
+      gl!.texImage2D(
+        gl!.TEXTURE_2D,
+        0,
+        gl!.RGBA,
+        width,
+        height,
+        0,
+        gl!.RGBA,
+        gl!.UNSIGNED_BYTE,
+        null,
+      );
       gl!.texParameteri(gl!.TEXTURE_2D, gl!.TEXTURE_MIN_FILTER, gl!.LINEAR);
       gl!.texParameteri(gl!.TEXTURE_2D, gl!.TEXTURE_MAG_FILTER, gl!.LINEAR);
       gl!.texParameteri(gl!.TEXTURE_2D, gl!.TEXTURE_WRAP_S, gl!.CLAMP_TO_EDGE);
@@ -395,7 +423,13 @@ export default function VolumetricClouds({
 
       fbo = gl!.createFramebuffer();
       gl!.bindFramebuffer(gl!.FRAMEBUFFER, fbo);
-      gl!.framebufferTexture2D(gl!.FRAMEBUFFER, gl!.COLOR_ATTACHMENT0, gl!.TEXTURE_2D, sceneTex, 0);
+      gl!.framebufferTexture2D(
+        gl!.FRAMEBUFFER,
+        gl!.COLOR_ATTACHMENT0,
+        gl!.TEXTURE_2D,
+        sceneTex,
+        0,
+      );
       gl!.bindFramebuffer(gl!.FRAMEBUFFER, null);
 
       fboWidth = width;
@@ -482,7 +516,10 @@ export default function VolumetricClouds({
         gl!.bindTexture(gl!.TEXTURE_2D, sceneTex);
         gl!.uniform1i(glyphU.sceneTex, 0);
         gl!.uniform2f(glyphU.resolution, w, h);
-        gl!.uniform1f(glyphU.cellSize, c.cellSize * (window.devicePixelRatio || 1));
+        gl!.uniform1f(
+          glyphU.cellSize,
+          c.cellSize * (window.devicePixelRatio || 1),
+        );
         gl!.uniform1f(glyphU.saturation, c.saturation);
         gl!.uniform1f(glyphU.contrast, c.contrast);
         gl!.uniform1f(glyphU.brightness, c.brightness);
@@ -520,7 +557,7 @@ export default function VolumetricClouds({
         style={{
           display: "block",
           height: "100%",
-          opacity: scrollProgress < 0.9 ? 1 : 1 - (scrollProgress - 0.9) / 0.1,
+          opacity: scrollProgress < 0.7 ? 1 : 1 - (scrollProgress - 0.7) / 0.1,
           width: "100%",
         }}
       />
