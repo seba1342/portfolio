@@ -32,23 +32,54 @@ const SECTIONS: SectionDef[] = [
   },
   {
     items: [
-      { key: "camElevation", label: "Elevation", max: 1.5, min: -0.5, step: 0.05 },
+      {
+        key: "camElevation",
+        label: "Elevation",
+        max: 1.5,
+        min: -0.5,
+        step: 0.05,
+      },
       { key: "camDistance", label: "Distance", max: 8.0, min: 1.0, step: 0.1 },
-      { key: "sunAngle", label: "Sun Angle", max: 3.14, min: -3.14, step: 0.05 },
+      {
+        key: "sunAngle",
+        label: "Sun Angle",
+        max: 3.14,
+        min: -3.14,
+        step: 0.05,
+      },
     ],
     title: "Camera & Light",
   },
   {
     items: [
-      { decimals: 0, key: "cellSize", label: "Cell Size", max: 32.0, min: 4.0, step: 1.0 },
+      {
+        decimals: 0,
+        key: "cellSize",
+        label: "Cell Size",
+        max: 32.0,
+        min: 4.0,
+        step: 1.0,
+      },
     ],
     title: "ASCII",
   },
   {
     items: [
-      { key: "brightness", label: "Brightness", max: 0.5, min: -0.5, step: 0.01 },
+      {
+        key: "brightness",
+        label: "Brightness",
+        max: 0.5,
+        min: -0.5,
+        step: 0.01,
+      },
       { key: "contrast", label: "Contrast", max: 3.0, min: 0.1, step: 0.05 },
-      { key: "saturation", label: "Saturation", max: 2.0, min: 0.0, step: 0.05 },
+      {
+        key: "saturation",
+        label: "Saturation",
+        max: 2.0,
+        min: 0.0,
+        step: 0.05,
+      },
       { key: "colorMix", label: "Color Mix", max: 1.0, min: 0.0, step: 0.05 },
       { key: "bgColor", label: "Background" },
       { key: "glyphColor", label: "Glyph Color" },
@@ -117,7 +148,7 @@ export default function ControlPanel({
   onChange: (c: Controls) => void;
 }) {
   const [copied, setCopied] = useState(false);
-  const [collapsed, setCollapsed] = useState(false);
+  const [collapsed, setCollapsed] = useState(true);
   const [pasteValue, setPasteValue] = useState("");
   const [pasteError, setPasteError] = useState("");
   const [showPaste, setShowPaste] = useState(false);
