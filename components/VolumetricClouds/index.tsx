@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
+import ControlPanel from "./ControlPanel";
+import { DEFAULTS } from "./controls";
 
 const vertexShaderSource = `#version 300 es
 in vec2 a_position;
@@ -227,16 +229,11 @@ void main() {
 
     vec3 sceneColor = texture(u_sceneTex, cellUV).rgb;
 
-    // Brightness
     sceneColor += u_brightness;
-
-    // Contrast (around 0.5 midpoint)
     sceneColor = (sceneColor - 0.5) * u_contrast + 0.5;
 
-    // Saturation
     float gray = dot(sceneColor, vec3(0.299, 0.587, 0.114));
     sceneColor = mix(vec3(gray), sceneColor, u_saturation);
-
     sceneColor = clamp(sceneColor, 0.0, 1.0);
 
     float brightness = dot(sceneColor, vec3(0.299, 0.587, 0.114));
@@ -244,7 +241,6 @@ void main() {
     vec2 localUV = fract(uv * cellCount);
     float glyphValue = getGlyph(brightness, localUV);
 
-    // Mix between scene color tint and flat glyph color
     vec3 tintedColor = mix(u_glyphColor, sceneColor, u_colorMix);
     vec3 finalColor = mix(u_bgColor, tintedColor, glyphValue);
     finalColor = min(finalColor, vec3(0.953, 0.839, 0.686));
@@ -299,17 +295,7 @@ function createNoiseTexture(gl: WebGL2RenderingContext): WebGLTexture {
   }
   const texture = gl.createTexture()!;
   gl.bindTexture(gl.TEXTURE_2D, texture);
-  gl.texImage2D(
-    gl.TEXTURE_2D,
-    0,
-    gl.RGBA,
-    size,
-    size,
-    0,
-    gl.RGBA,
-    gl.UNSIGNED_BYTE,
-    data,
-  );
+  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, size, size, 0, gl.RGBA, gl.UNSIGNED_BYTE, data);
   gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
   gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
   gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT);
@@ -324,559 +310,6 @@ function hexToRgb(hex: string): [number, number, number] {
   return [r, g, b];
 }
 
-function rgbToHex(r: number, g: number, b: number): string {
-  const toHex = (v: number) =>
-    Math.round(Math.max(0, Math.min(1, v)) * 255)
-      .toString(16)
-      .padStart(2, "0");
-  return `#${toHex(r)}${toHex(g)}${toHex(b)}`;
-}
-
-interface Controls {
-  asciiEnabled: boolean;
-  bgColor: string;
-  brightness: number;
-  camDistance: number;
-  camElevation: number;
-  cellSize: number;
-  cloudDark: string;
-  cloudHeight: number;
-  cloudLight: string;
-  colorMix: number;
-  contrast: number;
-  coverage: number;
-  density: number;
-  glyphColor: string;
-  saturation: number;
-  skyBase: string;
-  skyGradient: string;
-  sunAngle: number;
-  sunGlare: string;
-  sunGlow: string;
-  timeSpeed: number;
-}
-
-const DEFAULTS: Controls = {
-  asciiEnabled: true,
-  bgColor: "#f4d6b0",
-  brightness: 0,
-  camDistance: 5,
-  camElevation: 0.2,
-  cellSize: 8,
-  cloudDark: "#f4d6b0",
-  cloudHeight: -1.9,
-  cloudLight: "#341109",
-  colorMix: 1,
-  contrast: 1,
-  coverage: 2.5,
-  density: 0.8,
-  glyphColor: "#341109",
-  saturation: 1,
-  skyBase: "#f4d6b0",
-  skyGradient: "#341109",
-  sunAngle: 0.61,
-  sunGlare: "#f4d6b0",
-  sunGlow: "#f4d6b0",
-  timeSpeed: 0.4,
-};
-
-type SkyPreset = {
-  cloudDark: string;
-  cloudLight: string;
-  label: string;
-  skyBase: string;
-  skyGradient: string;
-  sunAngle: number;
-  sunGlare: string;
-  sunGlow: string;
-};
-
-const SKY_PRESETS: SkyPreset[] = [
-  {
-    cloudDark: "#404b59",
-    cloudLight: "#fff2cc",
-    label: "Day",
-    skyBase: "#99b5bf",
-    skyGradient: "#e680f2",
-    sunAngle: -0.785,
-    sunGlare: "#33140a",
-    sunGlow: "#ff991a",
-  },
-  {
-    cloudDark: "#2a1a2e",
-    cloudLight: "#ff9966",
-    label: "Sunset",
-    skyBase: "#cc6633",
-    skyGradient: "#331a33",
-    sunAngle: -0.2,
-    sunGlare: "#ff6633",
-    sunGlow: "#ff4400",
-  },
-  {
-    cloudDark: "#1a1a33",
-    cloudLight: "#ffccaa",
-    label: "Sunrise",
-    skyBase: "#6b5a7a",
-    skyGradient: "#4d3366",
-    sunAngle: -2.8,
-    sunGlare: "#cc6644",
-    sunGlow: "#ff8844",
-  },
-];
-
-type SliderDef = {
-  decimals?: number;
-  key: keyof Controls;
-  label: string;
-  max: number;
-  min: number;
-  step: number;
-};
-
-type ColorDef = {
-  key: keyof Controls;
-  label: string;
-};
-
-type SectionDef = {
-  items: (ColorDef | SliderDef)[];
-  title: string;
-};
-
-const SECTIONS: SectionDef[] = [
-  {
-    items: [
-      { key: "coverage", label: "Coverage", max: 3.0, min: 0.5, step: 0.05 },
-      { key: "cloudHeight", label: "Height", max: 0.0, min: -4.0, step: 0.1 },
-      { key: "density", label: "Density", max: 1.0, min: 0.1, step: 0.05 },
-      { key: "timeSpeed", label: "Speed", max: 3.0, min: 0.0, step: 0.1 },
-    ],
-    title: "Clouds",
-  },
-  {
-    items: [
-      {
-        key: "camElevation",
-        label: "Elevation",
-        max: 1.5,
-        min: -0.5,
-        step: 0.05,
-      },
-      {
-        key: "camDistance",
-        label: "Distance",
-        max: 8.0,
-        min: 1.0,
-        step: 0.1,
-      },
-      {
-        key: "sunAngle",
-        label: "Sun Angle",
-        max: 3.14,
-        min: -3.14,
-        step: 0.05,
-      },
-    ],
-    title: "Camera & Light",
-  },
-  {
-    items: [
-      {
-        decimals: 0,
-        key: "cellSize",
-        label: "Cell Size",
-        max: 32.0,
-        min: 4.0,
-        step: 1.0,
-      },
-    ],
-    title: "ASCII",
-  },
-  {
-    items: [
-      {
-        key: "brightness",
-        label: "Brightness",
-        max: 0.5,
-        min: -0.5,
-        step: 0.01,
-      },
-      { key: "contrast", label: "Contrast", max: 3.0, min: 0.1, step: 0.05 },
-      {
-        key: "saturation",
-        label: "Saturation",
-        max: 2.0,
-        min: 0.0,
-        step: 0.05,
-      },
-      {
-        key: "colorMix",
-        label: "Color Mix",
-        max: 1.0,
-        min: 0.0,
-        step: 0.05,
-      },
-      { key: "bgColor", label: "Background" },
-      { key: "glyphColor", label: "Glyph Color" },
-    ],
-    title: "Color",
-  },
-  {
-    items: [
-      { key: "skyBase", label: "Sky Base" },
-      { key: "skyGradient", label: "Sky Gradient" },
-      { key: "sunGlow", label: "Sun Glow" },
-      { key: "sunGlare", label: "Sun Glare" },
-      { key: "cloudLight", label: "Cloud Light" },
-      { key: "cloudDark", label: "Cloud Dark" },
-    ],
-    title: "Sky",
-  },
-];
-
-function isSlider(item: ColorDef | SliderDef): item is SliderDef {
-  return "min" in item;
-}
-
-const panelBaseStyle: React.CSSProperties = {
-  background: "rgba(0,0,0,0.75)",
-  borderRadius: 8,
-  color: "#fff",
-  display: "flex",
-  flexDirection: "column",
-  fontFamily: "monospace",
-  fontSize: 11,
-  gap: 4,
-  maxHeight: "calc(100vh - 24px)",
-  overflowY: "auto",
-  padding: 12,
-  position: "fixed",
-  width: 310,
-  zIndex: 9999,
-};
-
-const sectionTitleStyle: React.CSSProperties = {
-  borderBottom: "1px solid rgba(255,255,255,0.2)",
-  fontSize: 10,
-  letterSpacing: 1,
-  marginTop: 6,
-  opacity: 0.6,
-  paddingBottom: 2,
-  textTransform: "uppercase",
-};
-
-const btnStyle: React.CSSProperties = {
-  background: "rgba(255,255,255,0.15)",
-  border: "1px solid rgba(255,255,255,0.3)",
-  borderRadius: 4,
-  color: "#fff",
-  cursor: "pointer",
-  fontSize: 11,
-  padding: "4px 8px",
-};
-
-function ControlPanel({
-  controls,
-  onChange,
-}: {
-  controls: Controls;
-  onChange: (c: Controls) => void;
-}) {
-  const [copied, setCopied] = useState(false);
-  const [collapsed, setCollapsed] = useState(false);
-  const [pasteValue, setPasteValue] = useState("");
-  const [pasteError, setPasteError] = useState("");
-  const [showPaste, setShowPaste] = useState(false);
-  const [pos, setPos] = useState({ x: -1, y: 12 });
-  const dragRef = useRef<{
-    originX: number;
-    originY: number;
-    startX: number;
-    startY: number;
-  } | null>(null);
-  const panelRef = useRef<HTMLDivElement>(null);
-
-  // Initialize position to top-right on mount
-  useEffect(() => {
-    if (pos.x === -1) {
-      setPos({ x: window.innerWidth - 310 - 12, y: 12 });
-    }
-  }, [pos.x]);
-
-  useEffect(() => {
-    const onMouseMove = (e: MouseEvent) => {
-      if (!dragRef.current) return;
-      const dx = e.clientX - dragRef.current.startX;
-      const dy = e.clientY - dragRef.current.startY;
-      setPos({
-        x: dragRef.current.originX + dx,
-        y: dragRef.current.originY + dy,
-      });
-    };
-    const onMouseUp = () => {
-      dragRef.current = null;
-    };
-    window.addEventListener("mousemove", onMouseMove);
-    window.addEventListener("mouseup", onMouseUp);
-    return () => {
-      window.removeEventListener("mousemove", onMouseMove);
-      window.removeEventListener("mouseup", onMouseUp);
-    };
-  }, []);
-
-  const onDragStart = (e: React.MouseEvent) => {
-    e.preventDefault();
-    dragRef.current = {
-      originX: pos.x,
-      originY: pos.y,
-      startX: e.clientX,
-      startY: e.clientY,
-    };
-  };
-
-  const copySettings = () => {
-    const settings = JSON.stringify(controls, null, 2);
-    navigator.clipboard.writeText(settings).then(() => {
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    });
-  };
-
-  return (
-    <div
-      ref={panelRef}
-      style={{
-        ...panelBaseStyle,
-        left: pos.x,
-        top: pos.y,
-        width: collapsed ? "auto" : 310,
-      }}
-    >
-      <div
-        style={{
-          alignItems: "center",
-          display: "flex",
-          gap: 8,
-          userSelect: "none",
-        }}
-      >
-        <div
-          onMouseDown={onDragStart}
-          style={{
-            cursor: "grab",
-            flex: 1,
-            fontSize: 10,
-            letterSpacing: 1,
-            opacity: 0.5,
-            textTransform: "uppercase",
-          }}
-        >
-          ⠿ {collapsed ? "Dev" : "drag to move"}
-        </div>
-        <button
-          onClick={() => setCollapsed(!collapsed)}
-          style={{
-            ...btnStyle,
-            fontSize: 10,
-            lineHeight: 1,
-            padding: "2px 6px",
-          }}
-          type="button"
-        >
-          {collapsed ? "+" : "−"}
-        </button>
-      </div>
-      {!collapsed && (
-        <>
-          <label style={{ alignItems: "center", display: "flex", gap: 8 }}>
-            <input
-              checked={controls.asciiEnabled}
-              onChange={(e) =>
-                onChange({ ...controls, asciiEnabled: e.target.checked })
-              }
-              type="checkbox"
-            />
-            <span>ASCII Mode</span>
-          </label>
-
-          {SECTIONS.map((section) => (
-            <div key={section.title}>
-              <div style={sectionTitleStyle}>{section.title}</div>
-              {section.title === "Sky" && (
-                <div style={{ display: "flex", gap: 4, marginTop: 4 }}>
-                  {SKY_PRESETS.map((preset) => (
-                    <button
-                      key={preset.label}
-                      onClick={() =>
-                        onChange({
-                          ...controls,
-                          cloudDark: preset.cloudDark,
-                          cloudLight: preset.cloudLight,
-                          skyBase: preset.skyBase,
-                          skyGradient: preset.skyGradient,
-                          sunAngle: preset.sunAngle,
-                          sunGlare: preset.sunGlare,
-                          sunGlow: preset.sunGlow,
-                        })
-                      }
-                      style={btnStyle}
-                      type="button"
-                    >
-                      {preset.label}
-                    </button>
-                  ))}
-                </div>
-              )}
-              {section.items.map((item) => {
-                if (isSlider(item)) {
-                  const decimals = item.decimals ?? 2;
-                  return (
-                    <label
-                      key={item.key}
-                      style={{
-                        alignItems: "center",
-                        display: "flex",
-                        gap: 8,
-                        marginTop: 4,
-                      }}
-                    >
-                      <span style={{ width: 80 }}>{item.label}</span>
-                      <input
-                        max={item.max}
-                        min={item.min}
-                        onChange={(e) =>
-                          onChange({
-                            ...controls,
-                            [item.key]: parseFloat(e.target.value),
-                          })
-                        }
-                        step={item.step}
-                        style={{ flex: 1 }}
-                        type="range"
-                        value={controls[item.key] as number}
-                      />
-                      <span style={{ textAlign: "right", width: 40 }}>
-                        {(controls[item.key] as number).toFixed(decimals)}
-                      </span>
-                    </label>
-                  );
-                }
-                return (
-                  <label
-                    key={item.key}
-                    style={{
-                      alignItems: "center",
-                      display: "flex",
-                      gap: 8,
-                      marginTop: 4,
-                    }}
-                  >
-                    <span style={{ width: 80 }}>{item.label}</span>
-                    <input
-                      onChange={(e) =>
-                        onChange({ ...controls, [item.key]: e.target.value })
-                      }
-                      style={{
-                        background: "none",
-                        border: "1px solid rgba(255,255,255,0.3)",
-                        borderRadius: 4,
-                        cursor: "pointer",
-                        height: 24,
-                        padding: 0,
-                        width: 32,
-                      }}
-                      type="color"
-                      value={controls[item.key] as string}
-                    />
-                    <span style={{ opacity: 0.6 }}>
-                      {controls[item.key] as string}
-                    </span>
-                  </label>
-                );
-              })}
-            </div>
-          ))}
-
-          <div
-            style={{
-              display: "flex",
-              gap: 6,
-              marginTop: 8,
-            }}
-          >
-            <button
-              onClick={() => onChange({ ...DEFAULTS })}
-              style={btnStyle}
-              type="button"
-            >
-              Reset
-            </button>
-            <button onClick={copySettings} style={btnStyle} type="button">
-              {copied ? "Copied!" : "Copy Settings"}
-            </button>
-            <button
-              onClick={() => setShowPaste(!showPaste)}
-              style={btnStyle}
-              type="button"
-            >
-              Paste
-            </button>
-          </div>
-          {showPaste && (
-            <div
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                gap: 4,
-                marginTop: 4,
-              }}
-            >
-              <textarea
-                onChange={(e) => setPasteValue(e.target.value)}
-                placeholder="Paste JSON settings here..."
-                style={{
-                  background: "rgba(255,255,255,0.1)",
-                  border: "1px solid rgba(255,255,255,0.3)",
-                  borderRadius: 4,
-                  color: "#fff",
-                  fontFamily: "monospace",
-                  fontSize: 10,
-                  minHeight: 60,
-                  padding: 6,
-                  resize: "vertical",
-                }}
-                value={pasteValue}
-              />
-              {pasteError && (
-                <span style={{ color: "#ff6666", fontSize: 10 }}>
-                  {pasteError}
-                </span>
-              )}
-              <button
-                onClick={() => {
-                  try {
-                    const parsed = JSON.parse(pasteValue);
-                    onChange({ ...controls, ...parsed });
-                    setPasteError("");
-                    setShowPaste(false);
-                    setPasteValue("");
-                  } catch {
-                    setPasteError("Invalid JSON");
-                  }
-                }}
-                style={btnStyle}
-                type="button"
-              >
-                Apply
-              </button>
-            </div>
-          )}
-        </>
-      )}
-    </div>
-  );
-}
-
 export default function VolumetricClouds({
   className,
   scrollProgress = 0,
@@ -885,12 +318,11 @@ export default function VolumetricClouds({
   scrollProgress?: number;
 }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const controlsRef = useRef<Controls>({ ...DEFAULTS });
+  const controlsRef = useRef({ ...DEFAULTS });
   const scrollRef = useRef(scrollProgress);
-  const [controls, setControls] = useState<Controls>({ ...DEFAULTS });
+  const [controls, setControls] = useState({ ...DEFAULTS });
 
   scrollRef.current = scrollProgress;
-
   controlsRef.current = controls;
 
   useEffect(() => {
@@ -900,12 +332,7 @@ export default function VolumetricClouds({
     const gl = canvas.getContext("webgl2");
     if (!gl) return;
 
-    // Pass 1: volumetric clouds
-    const cloudsProgram = createProgram(
-      gl,
-      vertexShaderSource,
-      cloudsFragSource,
-    );
+    const cloudsProgram = createProgram(gl, vertexShaderSource, cloudsFragSource);
     const cloudsU = {
       camDistance: gl.getUniformLocation(cloudsProgram, "u_camDistance"),
       camElevation: gl.getUniformLocation(cloudsProgram, "u_camElevation"),
@@ -924,7 +351,6 @@ export default function VolumetricClouds({
       time: gl.getUniformLocation(cloudsProgram, "u_time"),
     };
 
-    // Pass 2: ASCII glyph post-process
     const glyphProgram = createProgram(gl, vertexShaderSource, glyphFragSource);
     const glyphU = {
       bgColor: gl.getUniformLocation(glyphProgram, "u_bgColor"),
@@ -938,14 +364,9 @@ export default function VolumetricClouds({
       sceneTex: gl.getUniformLocation(glyphProgram, "u_sceneTex"),
     };
 
-    // Shared quad
     const quadBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, quadBuffer);
-    gl.bufferData(
-      gl.ARRAY_BUFFER,
-      new Float32Array([-1, -1, 1, -1, -1, 1, 1, 1]),
-      gl.STATIC_DRAW,
-    );
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 1, -1, -1, 1, 1, 1]), gl.STATIC_DRAW);
     const quadVAO = gl.createVertexArray();
     gl.bindVertexArray(quadVAO);
     const posLoc = gl.getAttribLocation(cloudsProgram, "a_position");
@@ -954,7 +375,6 @@ export default function VolumetricClouds({
 
     const noiseTex = createNoiseTexture(gl);
 
-    // Framebuffer for pass 1 output
     let fbo: WebGLFramebuffer | null = null;
     let sceneTex: WebGLTexture | null = null;
     let fboWidth = 0;
@@ -967,17 +387,7 @@ export default function VolumetricClouds({
 
       sceneTex = gl!.createTexture();
       gl!.bindTexture(gl!.TEXTURE_2D, sceneTex);
-      gl!.texImage2D(
-        gl!.TEXTURE_2D,
-        0,
-        gl!.RGBA,
-        width,
-        height,
-        0,
-        gl!.RGBA,
-        gl!.UNSIGNED_BYTE,
-        null,
-      );
+      gl!.texImage2D(gl!.TEXTURE_2D, 0, gl!.RGBA, width, height, 0, gl!.RGBA, gl!.UNSIGNED_BYTE, null);
       gl!.texParameteri(gl!.TEXTURE_2D, gl!.TEXTURE_MIN_FILTER, gl!.LINEAR);
       gl!.texParameteri(gl!.TEXTURE_2D, gl!.TEXTURE_MAG_FILTER, gl!.LINEAR);
       gl!.texParameteri(gl!.TEXTURE_2D, gl!.TEXTURE_WRAP_S, gl!.CLAMP_TO_EDGE);
@@ -985,13 +395,7 @@ export default function VolumetricClouds({
 
       fbo = gl!.createFramebuffer();
       gl!.bindFramebuffer(gl!.FRAMEBUFFER, fbo);
-      gl!.framebufferTexture2D(
-        gl!.FRAMEBUFFER,
-        gl!.COLOR_ATTACHMENT0,
-        gl!.TEXTURE_2D,
-        sceneTex,
-        0,
-      );
+      gl!.framebufferTexture2D(gl!.FRAMEBUFFER, gl!.COLOR_ATTACHMENT0, gl!.TEXTURE_2D, sceneTex, 0);
       gl!.bindFramebuffer(gl!.FRAMEBUFFER, null);
 
       fboWidth = width;
@@ -1025,6 +429,7 @@ export default function VolumetricClouds({
 
       const w = canvas!.width;
       const h = canvas!.height;
+      const sp = scrollRef.current;
 
       gl!.bindVertexArray(quadVAO);
 
@@ -1035,19 +440,18 @@ export default function VolumetricClouds({
         gl!.bindFramebuffer(gl!.FRAMEBUFFER, null);
       }
 
+      // Pass 1: volumetric clouds
       gl!.viewport(0, 0, w, h);
       gl!.useProgram(cloudsProgram);
       gl!.uniform1f(cloudsU.time, time);
       gl!.uniform2f(cloudsU.resolution, w, h);
       gl!.uniform1f(cloudsU.coverage, c.coverage);
-      const sp = scrollRef.current;
       gl!.uniform1f(cloudsU.cloudHeight, c.cloudHeight + sp * 0.5);
-      const scrollCamElevation = 0.2 + sp * 0.2;
-      gl!.uniform1f(cloudsU.camElevation, scrollCamElevation);
-      const scrollCamDistance = 5.0 - sp * 3.0;
-      gl!.uniform1f(cloudsU.camDistance, scrollCamDistance);
+      gl!.uniform1f(cloudsU.camElevation, c.camElevation + sp * 0.2);
+      gl!.uniform1f(cloudsU.camDistance, c.camDistance - sp * 2.0);
       gl!.uniform1f(cloudsU.sunAngle, c.sunAngle);
       gl!.uniform1f(cloudsU.density, c.density);
+
       const skyB = hexToRgb(c.skyBase);
       const skyG = hexToRgb(c.skyGradient);
       const sunGl = hexToRgb(c.sunGlow);
@@ -1060,11 +464,13 @@ export default function VolumetricClouds({
       gl!.uniform3f(cloudsU.sunGlare, sunGr[0], sunGr[1], sunGr[2]);
       gl!.uniform3f(cloudsU.cloudLight, clL[0], clL[1], clL[2]);
       gl!.uniform3f(cloudsU.cloudDark, clD[0], clD[1], clD[2]);
+
       gl!.activeTexture(gl!.TEXTURE0);
       gl!.bindTexture(gl!.TEXTURE_2D, noiseTex);
       gl!.uniform1i(cloudsU.noiseTex, 0);
       gl!.drawArrays(gl!.TRIANGLE_STRIP, 0, 4);
 
+      // Pass 2: ASCII glyph post-process
       if (c.asciiEnabled) {
         const bg = hexToRgb(c.bgColor);
         const fg = hexToRgb(c.glyphColor);
@@ -1076,10 +482,7 @@ export default function VolumetricClouds({
         gl!.bindTexture(gl!.TEXTURE_2D, sceneTex);
         gl!.uniform1i(glyphU.sceneTex, 0);
         gl!.uniform2f(glyphU.resolution, w, h);
-        gl!.uniform1f(
-          glyphU.cellSize,
-          c.cellSize * (window.devicePixelRatio || 1),
-        );
+        gl!.uniform1f(glyphU.cellSize, c.cellSize * (window.devicePixelRatio || 1));
         gl!.uniform1f(glyphU.saturation, c.saturation);
         gl!.uniform1f(glyphU.contrast, c.contrast);
         gl!.uniform1f(glyphU.brightness, c.brightness);
@@ -1121,7 +524,8 @@ export default function VolumetricClouds({
           width: "100%",
         }}
       />
-      {typeof document !== "undefined" &&
+      {process.env.NODE_ENV === "development" &&
+        typeof document !== "undefined" &&
         createPortal(
           <ControlPanel controls={controls} onChange={setControls} />,
           document.body,
