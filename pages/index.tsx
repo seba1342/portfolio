@@ -2,6 +2,7 @@ import Content from "@/components/Layout/Content";
 import Projects from "@/components/Projects";
 import ScrambleOnHover from "@/components/ScrambleOnHover";
 import { Body, Titles } from "@/components/text";
+import flightTrackerImage from "./projects/flight-tracker/assets/flight-tracker.png";
 import gratitudesImage from "./projects/gratitudes/assets/gratitudes.png";
 
 export default function Home() {
@@ -36,6 +37,13 @@ export default function Home() {
         </Body.Default>
       </div>
       <Projects>
+        <Projects.Project
+          backgroundClass="flightTracker__background"
+          href="/projects/flight-tracker"
+          image={flightTrackerImage}
+          subtitle="Live flight tracking visualisation."
+          title="Flight Tracker"
+        />
         <Projects.Project
           backgroundClass="gratitudes__background"
           href="/projects/gratitudes"

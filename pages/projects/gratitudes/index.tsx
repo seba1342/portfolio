@@ -12,7 +12,6 @@ export const theme = {
   backgroundColor: "#311730",
 };
 
-
 export default function Gratitudes() {
   return (
     <>
@@ -21,7 +20,8 @@ export default function Gratitudes() {
       >
         <FixedBanner backgroundColor={theme.backgroundColor}>
           <FixedBanner.Text>
-            Released: 20.10.23 • Platform: iOS & Android • Tech: React Native/Expo
+            Released: 20.10.23 • Platform: iOS & Android • Tech: React
+            Native/Expo
           </FixedBanner.Text>
         </FixedBanner>
         <Titles.H1 align="center" color="light">
@@ -49,12 +49,14 @@ export default function Gratitudes() {
           <Image
             alt="Gratitudes home page"
             className="w-[45%] max-w-[300px]"
+            loading="eager"
             priority
             src={gratitudesHomeImage}
           />
           <Image
             alt="Gratitudes entry page"
             className="w-[45%] max-w-[300px]"
+            loading="eager"
             priority
             src={gratitudesEntryImage}
           />

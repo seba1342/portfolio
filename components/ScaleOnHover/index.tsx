@@ -7,7 +7,7 @@ export default function ScaleOnHover({ children }: PropsWithChildren) {
   if (isSmallDevice) return children;
 
   return (
-    <div className="transition-none sm:transition-transform hover:scale-[103%] duration-300 ease-in-out">
+    <div className="h-full transition-none sm:transition-transform hover:scale-[103%] duration-300 ease-in-out">
       {children}
     </div>
   );

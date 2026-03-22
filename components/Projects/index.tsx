@@ -27,7 +27,7 @@ function Project({
   return (
     <ScaleOnHover>
       <Link
-        className={`group p-6 rounded-2xl flex justify-center ${
+        className={`group p-6 rounded-2xl flex justify-center h-full ${
           backgroundClass ?? ""
         }`}
         href={href}
