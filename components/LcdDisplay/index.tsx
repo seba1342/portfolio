@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Mono } from "@/components/text";
 
-const SCREEN_WIDTH = 15;
+const SCREEN_WIDTH = 16;
 
 const AIRPORTS = [
   { city: "Sydney", code: "SYD" },
@@ -226,10 +226,24 @@ export default function LcdDisplay() {
 
   return (
     <div className="flex flex-col items-center gap-4 my-12">
-      <div className="flex flex-col gap-1 rounded-md bg-bark p-1">
-        <div className="flex flex-col rounded-sm bg-[#2a4a6b] p-3 gap-1">
-          <Text>{topLine}</Text>
-          <Text>{bottomLine}</Text>
+      <div className="relative rounded-md bg-[#2d6b3a] p-4 pt-6 pb-4">
+        {/* PCB screw holes */}
+        <div className="absolute top-2 left-2 w-2.5 h-2.5 rounded-full bg-[#1a4a25] border border-[#3a8a4a]" />
+        <div className="absolute top-2 right-2 w-2.5 h-2.5 rounded-full bg-[#1a4a25] border border-[#3a8a4a]" />
+        <div className="absolute bottom-2 left-2 w-2.5 h-2.5 rounded-full bg-[#1a4a25] border border-[#3a8a4a]" />
+        <div className="absolute bottom-2 right-2 w-2.5 h-2.5 rounded-full bg-[#1a4a25] border border-[#3a8a4a]" />
+        {/* Header pins */}
+        <div className="absolute -top-1 left-6 right-6 flex justify-between">
+          {Array.from({ length: 16 }).map((_, i) => (
+            <div className="w-1 h-2 bg-[#c0a030] rounded-sm" key={i} />
+          ))}
+        </div>
+        {/* LCD module */}
+        <div className="rounded-sm bg-[#1a1a1a] p-1">
+          <div className="flex flex-col rounded-sm bg-[#2a4a6b] p-3 gap-1">
+            <Text>{topLine}</Text>
+            <Text>{bottomLine}</Text>
+          </div>
         </div>
       </div>
 

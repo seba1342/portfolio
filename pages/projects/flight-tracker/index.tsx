@@ -1,7 +1,10 @@
 import { useEffect, useRef, useState } from "react";
 import dynamic from "next/dynamic";
+import Image from "next/image";
 import Content from "@/components/Layout/Content";
 import LcdDisplay from "@/components/LcdDisplay";
+import MediaBlock from "@/components/MediaBlock";
+import ScrambleOnHover from "@/components/ScrambleOnHover";
 import { Body, Mono, Titles } from "@/components/text";
 
 const VolumetricClouds = dynamic(
@@ -15,8 +18,15 @@ export default function FlightTracker() {
   const contentRef = useRef<HTMLDivElement>(null);
   const titleRef = useRef<HTMLDivElement>(null);
 
+  const doneRef = useRef(false);
+
   useEffect(() => {
     const onScroll = () => {
+      if (doneRef.current) {
+        if (window.scrollY < window.innerHeight) doneRef.current = false;
+        else return;
+      }
+
       const progress = Math.min(1, window.scrollY / window.innerHeight);
       setScrollProgress(progress);
 
@@ -27,7 +37,10 @@ export default function FlightTracker() {
         const titleBottom = titleEl.getBoundingClientRect().bottom;
         const gap = contentTop - titleBottom;
         const fadeZone = 150;
-        setFadeProgress(Math.max(0, Math.min(1, 1 - gap / fadeZone)));
+        const fade = Math.max(0, Math.min(1, 1 - gap / fadeZone));
+        setFadeProgress(fade);
+
+        if (fade >= 1) doneRef.current = true;
       }
     };
     window.addEventListener("scroll", onScroll, { passive: true });
@@ -55,85 +68,110 @@ export default function FlightTracker() {
       <Content className="flex flex-col pb-32 pt-4 md:pt-12">
         <Titles.H3 className="text-center">
           A physical device that helps identify planes that we can see from our
-          balcony. Know where these plans are coming from and going to with the
-          press of a button.
+          balcony. Know where they are coming from and where they are going with
+          the press of a button.
         </Titles.H3>
 
-        <LcdDisplay />
-
-        <Mono.Default className="w-full text-center pb-24">
+        <Mono.Default className="w-full text-center py-6 md:py-24">
           {">< >< >< >< >< >< >< >< ><"}
         </Mono.Default>
 
-        <Titles.H2>Hardware</Titles.H2>
-        <Titles.H3>Arduino Uno R4 WiFi</Titles.H3>
+        <MediaBlock>
+          <MediaBlock.Media>
+            <video
+              autoPlay
+              loop
+              muted
+              playsInline
+              src="/videos/flight-tracker-demo.mp4"
+            />
+          </MediaBlock.Media>
+          <MediaBlock.Content>
+            <Body.Default spacing="mb-0">
+              We live in the perfect spot to view a popular flight path and have
+              always wanted to know where certain flights were coming from and
+              going to.
+            </Body.Default>
+            <Body.Default spacing="mb-0">
+              I&rsquo;ve always wanted to build something using an Arduino, and
+              thought this would be the perfect project to dip my toes in the
+              hardware world.
+            </Body.Default>
+            <Body.Default spacing="mb-0">
+              This project is still a work in progress.
+            </Body.Default>
+          </MediaBlock.Content>
+        </MediaBlock>
+
+        <MediaBlock reverse>
+          <MediaBlock.Media>
+            <Image
+              alt="Flight Tracker hardware — Arduino Uno R4 WiFi wired to an LCD display and button on a breadboard"
+              className=""
+              height={900}
+              src="/images/flight-tracker-hardware.jpg"
+              width={1200}
+            />
+          </MediaBlock.Media>
+          <MediaBlock.Content>
+            <Titles.H3 spacing="mb-0">Hardware</Titles.H3>
+            <Body.Default spacing="mb-0">
+              This was my first time working with an Arduino. I chose to go with
+              the <span className="italic">Arduino Uno R4 WiFi</span>.
+              It&rsquo;s a fairly inexpensive chip (~$50 AUD) that can connect
+              to the internet with an ethernet cord. I wired it up to a button
+              and a simple 2x16 LCD screen to display flight information.
+            </Body.Default>
+          </MediaBlock.Content>
+        </MediaBlock>
+
+        <Titles.H3>Getting Flight Information</Titles.H3>
         <Body.Default>
-          This was my first time working with an Arduino. It was the perfect
-          piece of hardware to run this super simple piece of software. I wired
-          it up to a button and a simple 2x16 LCD screen to display all the
-          information about the planes.
+          To get realtime flight information whenever the button is pressed I
+          use the <span className="italic">FlightRadar24 API</span>. By
+          providing a certain region to search within I can confidently assume
+          that the plane I am looking at is the one that is returned. If there
+          are multiple flights available in the searchable region it will rotate
+          through all found flights.
         </Body.Default>
 
-        <Titles.H3>Display</Titles.H3>
         <Body.Default>
-          It shows a small plane ASCII art on idle, and when triggered it
-          scrolls through the route information for each flight it finds. For
-          routes longer than 16 characters it runs a marquee animation, so the
-          full origin-to-destination text is always readable.
+          Here is a demo of what the LCD renders (with fake flight data):
         </Body.Default>
 
-        {/* Placeholder for hardware photo/video */}
-        <div className="w-full h-[300px] md:h-[400px] rounded-2xl bg-softBark/20 flex items-center justify-center my-8">
-          <Mono.Default className="opacity-40">[ hardware photo ]</Mono.Default>
-        </div>
+        <LcdDisplay />
 
-        <Titles.H2>Software</Titles.H2>
-        <Titles.H3>Scanning the Sky</Titles.H3>
-        <Body.Default>
-          The device defines a geographic bounding box around my house using
-          latitude and longitude coordinates. When the button is pressed, it
-          queries the FlightRadar24 API for all airborne aircraft within that
-          box. The bounding box is configurable, so you could make it as narrow
-          as your street or as wide as your suburb.
-        </Body.Default>
+        <MediaBlock reverse>
+          <MediaBlock.Media>
+            <video
+              autoPlay
+              controls
+              loop
+              muted
+              playsInline
+              src="/videos/flight-tracker-hardware.mp4"
+            />
+          </MediaBlock.Media>
+          <MediaBlock.Content>
+            <Titles.H3>The Outcome</Titles.H3>
+            <Body.Default>
+              Here it is in action. The next thing to do for this project is to
+              package it up nicely. I think some sort of frame that allows me to
+              mount it to a wall somewhere would look nice and make it easily
+              accessible to anyone wanting to use it.
+            </Body.Default>
 
-        <Titles.H3>Flight Identification</Titles.H3>
-        <Body.Default>
-          Once the boundary scan returns a list of nearby flights, the device
-          takes each callsign and runs a second API call to look up the flight
-          details. It filters for live flights specifically, pulling out the
-          route information, the origin and destination airports. This two-step
-          approach means it only fetches detail for planes that are actually in
-          the air above you right now.
-        </Body.Default>
-
-        <Titles.H3>Display Logic</Titles.H3>
-        <Body.Default>
-          Results are displayed one flight at a time. The callsign appears on
-          the top row, and the route scrolls across the bottom row. Each flight
-          gets about 15 seconds of screen time before the next one rotates in.
-          After cycling through all detected flights, the display returns to
-          idle and the backlight turns off to save power.
-        </Body.Default>
-
-        {/* Placeholder for demo video */}
-        <div className="w-full h-[300px] md:h-[400px] rounded-2xl bg-softBark/20 flex items-center justify-center my-8">
-          <Mono.Default className="opacity-40">[ demo video ]</Mono.Default>
-        </div>
-
-        <Titles.H2>Tech Stack</Titles.H2>
-        <Body.Default>
-          The entire project is a single Arduino sketch. No server, no database,
-          no companion app. The device connects directly to WiFi, makes HTTPS
-          requests to the FlightRadar24 API via RapidAPI, parses the JSON
-          responses on-device, and renders the results to the LCD.
-        </Body.Default>
-        <Body.Default>
-          The simplicity is the point. It is a self-contained object that does
-          one thing well. The code is intentionally straightforward so anyone
-          with basic Arduino experience could build their own version and
-          configure it for their location.
-        </Body.Default>
+            <Body.Default>
+              You can find the code that the Arduino is running here:{" "}
+              <a
+                className="underline"
+                href="https://github.com/seba1342/flight-tracker"
+              >
+                Flight Tracker (GitHub)
+              </a>
+            </Body.Default>
+          </MediaBlock.Content>
+        </MediaBlock>
       </Content>
     </>
   );
