@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import Content from "@/components/Layout/Content";
+import LcdDisplay from "@/components/LcdDisplay";
 import { Body, Mono, Titles } from "@/components/text";
 
 const VolumetricClouds = dynamic(
@@ -43,55 +44,42 @@ export default function FlightTracker() {
         />
       </div>
       <div className="h-[165vh]">
-        <div ref={titleRef} className="sticky top-[calc(50vh-40px)] z-10 flex justify-center pointer-events-none">
+        <div
+          className="sticky top-[calc(50vh-40px)] z-10 flex justify-center"
+          ref={titleRef}
+        >
           <Titles.H1 spacing="mb-0 text-center">Flight Tracker</Titles.H1>
         </div>
       </div>
       <div ref={contentRef} />
       <Content className="flex flex-col pb-32 pt-4 md:pt-12">
         <Titles.H3 className="text-center">
-          A physical device that watches the sky above my house, identifies
-          nearby aircraft, and tells me where each flight is coming from and
-          going to.
+          A physical device that helps identify planes that we can see from our
+          balcony. Know where these plans are coming from and going to with the
+          press of a button.
         </Titles.H3>
 
-        <Mono.Default className="w-full text-center py-12">
+        <LcdDisplay />
+
+        <Mono.Default className="w-full text-center pb-24">
           {">< >< >< >< >< >< >< >< ><"}
         </Mono.Default>
-
-        <Titles.H2>The Idea</Titles.H2>
-        <Body.Default>
-          I live under a flight path. Planes pass overhead constantly, and I
-          found myself wondering where they were all going. Rather than pulling
-          out my phone and opening a flight tracking app each time, I wanted
-          something physical sitting on my desk that I could glance at or press
-          a button to find out.
-        </Body.Default>
 
         <Titles.H2>Hardware</Titles.H2>
         <Titles.H3>Arduino Uno R4 WiFi</Titles.H3>
         <Body.Default>
-          The brain of the project is an Arduino Uno R4 WiFi. It handles the
-          WiFi connection, API requests, JSON parsing, and drives the LCD
-          display. The built-in WiFi module keeps the hardware footprint small,
-          no need for a separate networking shield or a Raspberry Pi.
+          This was my first time working with an Arduino. It was the perfect
+          piece of hardware to run this super simple piece of software. I wired
+          it up to a button and a simple 2x16 LCD screen to display all the
+          information about the planes.
         </Body.Default>
 
-        <Titles.H3>16x2 LCD Display</Titles.H3>
+        <Titles.H3>Display</Titles.H3>
         <Body.Default>
-          A standard 16x2 character LCD connected over I2C. It shows a small
-          plane ASCII art on idle, and when triggered it scrolls through the
-          route information for each flight it finds. For routes longer than 16
-          characters it runs a marquee animation, so the full
-          origin-to-destination text is always readable.
-        </Body.Default>
-
-        <Titles.H3>Physical Button</Titles.H3>
-        <Body.Default>
-          A single tactile button wired to pin 4. Press it and the device wakes
-          up, scans the sky, and starts displaying results. There is something
-          satisfying about the interaction being entirely physical. No app to
-          open, no screen to unlock.
+          It shows a small plane ASCII art on idle, and when triggered it
+          scrolls through the route information for each flight it finds. For
+          routes longer than 16 characters it runs a marquee animation, so the
+          full origin-to-destination text is always readable.
         </Body.Default>
 
         {/* Placeholder for hardware photo/video */}

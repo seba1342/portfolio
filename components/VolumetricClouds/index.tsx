@@ -334,9 +334,11 @@ export default function VolumetricClouds({
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const controlsRef = useRef({ ...DEFAULTS });
   const scrollRef = useRef(scrollProgress);
+  const fadeRef = useRef(fadeProgress);
   const [controls, setControls] = useState({ ...DEFAULTS });
 
   scrollRef.current = scrollProgress;
+  fadeRef.current = fadeProgress;
   controlsRef.current = controls;
 
   useEffect(() => {
@@ -458,6 +460,13 @@ export default function VolumetricClouds({
     let animationFrameId: number;
 
     function render(currentTime: number) {
+      animationFrameId = requestAnimationFrame(render);
+
+      if (fadeRef.current >= 1) {
+        lastTime = currentTime;
+        return;
+      }
+
       const c = controlsRef.current;
       const deltaTime = (currentTime - lastTime) / 1000;
       lastTime = currentTime;
@@ -532,8 +541,6 @@ export default function VolumetricClouds({
         gl!.uniform1f(glyphU.colorMix, c.colorMix);
         gl!.drawArrays(gl!.TRIANGLE_STRIP, 0, 4);
       }
-
-      animationFrameId = requestAnimationFrame(render);
     }
 
     animationFrameId = requestAnimationFrame(render);
