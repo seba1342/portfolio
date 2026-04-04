@@ -11,6 +11,7 @@ void main() {
 `;
 
 // Pass 1: volumetric clouds → framebuffer
+// Inspired by the cloud shader developed by: https://www.shadertoy.com/view/XslGRr
 const cloudsFragSource = `#version 300 es
 precision highp float;
 
@@ -162,6 +163,7 @@ void main() {
 `;
 
 // Pass 2: sample framebuffer, convert to ASCII glyphs with color controls
+// Inspired by the shader developed by: https://caidan.dev/portfolio/ascii_clouds
 const glyphFragSource = `#version 300 es
 precision highp float;
 
@@ -322,9 +324,11 @@ function hexToRgb(hex: string): [number, number, number] {
 
 export default function VolumetricClouds({
   className,
+  fadeProgress = 0,
   scrollProgress = 0,
 }: {
   className?: string;
+  fadeProgress?: number;
   scrollProgress?: number;
 }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -557,7 +561,7 @@ export default function VolumetricClouds({
         style={{
           display: "block",
           height: "100%",
-          opacity: scrollProgress < 0.7 ? 1 : 1 - (scrollProgress - 0.7) / 0.1,
+          opacity: 1 - fadeProgress,
           width: "100%",
         }}
       />

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import Content from "@/components/Layout/Content";
 import { Body, Mono, Titles } from "@/components/text";
@@ -10,11 +10,24 @@ const VolumetricClouds = dynamic(
 
 export default function FlightTracker() {
   const [scrollProgress, setScrollProgress] = useState(0);
+  const [fadeProgress, setFadeProgress] = useState(0);
+  const contentRef = useRef<HTMLDivElement>(null);
+  const titleRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const onScroll = () => {
       const progress = Math.min(1, window.scrollY / window.innerHeight);
       setScrollProgress(progress);
+
+      const contentEl = contentRef.current;
+      const titleEl = titleRef.current;
+      if (contentEl && titleEl) {
+        const contentTop = contentEl.getBoundingClientRect().top;
+        const titleBottom = titleEl.getBoundingClientRect().bottom;
+        const gap = contentTop - titleBottom;
+        const fadeZone = 150;
+        setFadeProgress(Math.max(0, Math.min(1, 1 - gap / fadeZone)));
+      }
     };
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
@@ -25,14 +38,16 @@ export default function FlightTracker() {
       <div className="fixed inset-0 -z-10">
         <VolumetricClouds
           className="w-full h-full"
+          fadeProgress={fadeProgress}
           scrollProgress={scrollProgress}
         />
       </div>
       <div className="h-[165vh]">
-        <div className="sticky top-[calc(50vh-40px)] z-10 flex justify-center pointer-events-none">
+        <div ref={titleRef} className="sticky top-[calc(50vh-40px)] z-10 flex justify-center pointer-events-none">
           <Titles.H1 spacing="mb-0 text-center">Flight Tracker</Titles.H1>
         </div>
       </div>
+      <div ref={contentRef} />
       <Content className="flex flex-col pb-32 pt-4 md:pt-12">
         <Titles.H3 className="text-center">
           A physical device that watches the sky above my house, identifies
