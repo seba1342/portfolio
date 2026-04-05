@@ -19,16 +19,25 @@ export default function FlightTracker() {
   const titleRef = useRef<HTMLDivElement>(null);
 
   const doneRef = useRef(false);
+  const animationFrameRef = useRef<null | number>(null);
+  const scrollProgressRef = useRef(-1);
+  const fadeProgressRef = useRef(-1);
 
   useEffect(() => {
-    const onScroll = () => {
+    const updateScrollState = () => {
       if (doneRef.current) {
         if (window.scrollY < window.innerHeight) doneRef.current = false;
-        else return;
+        else {
+          animationFrameRef.current = null;
+          return;
+        }
       }
 
-      const progress = Math.min(1, window.scrollY / window.innerHeight);
-      setScrollProgress(progress);
+      const nextScrollProgress = Math.min(1, window.scrollY / window.innerHeight);
+      if (nextScrollProgress !== scrollProgressRef.current) {
+        scrollProgressRef.current = nextScrollProgress;
+        setScrollProgress(nextScrollProgress);
+      }
 
       const contentEl = contentRef.current;
       const titleEl = titleRef.current;
@@ -37,14 +46,32 @@ export default function FlightTracker() {
         const titleBottom = titleEl.getBoundingClientRect().bottom;
         const gap = contentTop - titleBottom;
         const fadeZone = 150;
-        const fade = Math.max(0, Math.min(1, 1 - gap / fadeZone));
-        setFadeProgress(fade);
+        const nextFadeProgress = Math.max(0, Math.min(1, 1 - gap / fadeZone));
+        if (nextFadeProgress !== fadeProgressRef.current) {
+          fadeProgressRef.current = nextFadeProgress;
+          setFadeProgress(nextFadeProgress);
+        }
 
-        if (fade >= 1) doneRef.current = true;
+        if (nextFadeProgress >= 1) doneRef.current = true;
+      }
+
+      animationFrameRef.current = null;
+    };
+
+    const onScroll = () => {
+      if (animationFrameRef.current != null) return;
+      animationFrameRef.current = requestAnimationFrame(updateScrollState);
+    };
+
+    updateScrollState();
+    window.addEventListener("scroll", onScroll, { passive: true });
+
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      if (animationFrameRef.current != null) {
+        cancelAnimationFrame(animationFrameRef.current);
       }
     };
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
   return (

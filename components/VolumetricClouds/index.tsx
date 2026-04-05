@@ -322,6 +322,31 @@ function hexToRgb(hex: string): [number, number, number] {
   return [r, g, b];
 }
 
+type ParsedControls = {
+  bgColorRgb: [number, number, number];
+  cloudDarkRgb: [number, number, number];
+  cloudLightRgb: [number, number, number];
+  glyphColorRgb: [number, number, number];
+  skyBaseRgb: [number, number, number];
+  skyGradientRgb: [number, number, number];
+  sunGlareRgb: [number, number, number];
+  sunGlowRgb: [number, number, number];
+} & typeof DEFAULTS;
+
+function parseControls(controls: typeof DEFAULTS): ParsedControls {
+  return {
+    ...controls,
+    bgColorRgb: hexToRgb(controls.bgColor),
+    cloudDarkRgb: hexToRgb(controls.cloudDark),
+    cloudLightRgb: hexToRgb(controls.cloudLight),
+    glyphColorRgb: hexToRgb(controls.glyphColor),
+    skyBaseRgb: hexToRgb(controls.skyBase),
+    skyGradientRgb: hexToRgb(controls.skyGradient),
+    sunGlareRgb: hexToRgb(controls.sunGlare),
+    sunGlowRgb: hexToRgb(controls.sunGlow),
+  };
+}
+
 export default function VolumetricClouds({
   className,
   fadeProgress = 0,
@@ -332,14 +357,14 @@ export default function VolumetricClouds({
   scrollProgress?: number;
 }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const controlsRef = useRef({ ...DEFAULTS });
+  const controlsRef = useRef<ParsedControls>(parseControls(DEFAULTS));
   const scrollRef = useRef(scrollProgress);
   const fadeRef = useRef(fadeProgress);
   const [controls, setControls] = useState({ ...DEFAULTS });
 
   scrollRef.current = scrollProgress;
   fadeRef.current = fadeProgress;
-  controlsRef.current = controls;
+  controlsRef.current = parseControls(controls);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -442,18 +467,24 @@ export default function VolumetricClouds({
       fboHeight = height;
     }
 
-    function resize() {
+    function updateCanvasSize(rect?: DOMRectReadOnly) {
       const dpr = window.devicePixelRatio || 1;
-      const rect = canvas!.getBoundingClientRect();
-      const width = Math.floor(rect.width * dpr);
-      const height = Math.floor(rect.height * dpr);
+      const bounds = rect ?? canvas!.getBoundingClientRect();
+      const width = Math.floor(bounds.width * dpr);
+      const height = Math.floor(bounds.height * dpr);
       if (canvas!.width !== width || canvas!.height !== height) {
         canvas!.width = width;
         canvas!.height = height;
       }
     }
 
-    resize();
+    updateCanvasSize();
+    const resizeObserver = new ResizeObserver((entries) => {
+      const entry = entries[0];
+      if (!entry) return;
+      updateCanvasSize(entry.contentRect);
+    });
+    resizeObserver.observe(canvas);
 
     let time = 0;
     let lastTime = 0;
@@ -472,10 +503,9 @@ export default function VolumetricClouds({
       lastTime = currentTime;
       time += deltaTime * c.timeSpeed;
 
-      resize();
-
       const w = canvas!.width;
       const h = canvas!.height;
+      if (w === 0 || h === 0) return;
       const sp = scrollRef.current;
 
       gl!.bindVertexArray(quadVAO);
@@ -499,18 +529,42 @@ export default function VolumetricClouds({
       gl!.uniform1f(cloudsU.sunAngle, c.sunAngle);
       gl!.uniform1f(cloudsU.density, c.density);
 
-      const skyB = hexToRgb(c.skyBase);
-      const skyG = hexToRgb(c.skyGradient);
-      const sunGl = hexToRgb(c.sunGlow);
-      const sunGr = hexToRgb(c.sunGlare);
-      const clL = hexToRgb(c.cloudLight);
-      const clD = hexToRgb(c.cloudDark);
-      gl!.uniform3f(cloudsU.skyBase, skyB[0], skyB[1], skyB[2]);
-      gl!.uniform3f(cloudsU.skyGradient, skyG[0], skyG[1], skyG[2]);
-      gl!.uniform3f(cloudsU.sunGlow, sunGl[0], sunGl[1], sunGl[2]);
-      gl!.uniform3f(cloudsU.sunGlare, sunGr[0], sunGr[1], sunGr[2]);
-      gl!.uniform3f(cloudsU.cloudLight, clL[0], clL[1], clL[2]);
-      gl!.uniform3f(cloudsU.cloudDark, clD[0], clD[1], clD[2]);
+      gl!.uniform3f(
+        cloudsU.skyBase,
+        c.skyBaseRgb[0],
+        c.skyBaseRgb[1],
+        c.skyBaseRgb[2],
+      );
+      gl!.uniform3f(
+        cloudsU.skyGradient,
+        c.skyGradientRgb[0],
+        c.skyGradientRgb[1],
+        c.skyGradientRgb[2],
+      );
+      gl!.uniform3f(
+        cloudsU.sunGlow,
+        c.sunGlowRgb[0],
+        c.sunGlowRgb[1],
+        c.sunGlowRgb[2],
+      );
+      gl!.uniform3f(
+        cloudsU.sunGlare,
+        c.sunGlareRgb[0],
+        c.sunGlareRgb[1],
+        c.sunGlareRgb[2],
+      );
+      gl!.uniform3f(
+        cloudsU.cloudLight,
+        c.cloudLightRgb[0],
+        c.cloudLightRgb[1],
+        c.cloudLightRgb[2],
+      );
+      gl!.uniform3f(
+        cloudsU.cloudDark,
+        c.cloudDarkRgb[0],
+        c.cloudDarkRgb[1],
+        c.cloudDarkRgb[2],
+      );
 
       gl!.activeTexture(gl!.TEXTURE0);
       gl!.bindTexture(gl!.TEXTURE_2D, noiseTex);
@@ -519,9 +573,6 @@ export default function VolumetricClouds({
 
       // Pass 2: ASCII glyph post-process
       if (c.asciiEnabled) {
-        const bg = hexToRgb(c.bgColor);
-        const fg = hexToRgb(c.glyphColor);
-
         gl!.bindFramebuffer(gl!.FRAMEBUFFER, null);
         gl!.viewport(0, 0, w, h);
         gl!.useProgram(glyphProgram);
@@ -536,8 +587,18 @@ export default function VolumetricClouds({
         gl!.uniform1f(glyphU.saturation, c.saturation);
         gl!.uniform1f(glyphU.contrast, c.contrast);
         gl!.uniform1f(glyphU.brightness, c.brightness);
-        gl!.uniform3f(glyphU.bgColor, bg[0], bg[1], bg[2]);
-        gl!.uniform3f(glyphU.glyphColor, fg[0], fg[1], fg[2]);
+        gl!.uniform3f(
+          glyphU.bgColor,
+          c.bgColorRgb[0],
+          c.bgColorRgb[1],
+          c.bgColorRgb[2],
+        );
+        gl!.uniform3f(
+          glyphU.glyphColor,
+          c.glyphColorRgb[0],
+          c.glyphColorRgb[1],
+          c.glyphColorRgb[2],
+        );
         gl!.uniform1f(glyphU.colorMix, c.colorMix);
         gl!.drawArrays(gl!.TRIANGLE_STRIP, 0, 4);
       }
@@ -545,11 +606,12 @@ export default function VolumetricClouds({
 
     animationFrameId = requestAnimationFrame(render);
 
-    const onResize = () => resize();
+    const onResize = () => updateCanvasSize();
     window.addEventListener("resize", onResize);
 
     return () => {
       cancelAnimationFrame(animationFrameId);
+      resizeObserver.disconnect();
       window.removeEventListener("resize", onResize);
       gl.deleteProgram(cloudsProgram);
       gl.deleteProgram(glyphProgram);

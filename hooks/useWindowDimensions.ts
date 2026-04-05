@@ -30,5 +30,21 @@ export default function useWindowDimensions() {
 }
 
 export function useIsSmallDevice() {
-  return useWindowDimensions().width < 768;
+  const [isSmallDevice, setIsSmallDevice] = useState(false);
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia("(max-width: 767px)");
+
+    const updateIsSmallDevice = () => {
+      setIsSmallDevice(mediaQuery.matches);
+    };
+
+    updateIsSmallDevice();
+    mediaQuery.addEventListener("change", updateIsSmallDevice);
+
+    return () =>
+      mediaQuery.removeEventListener("change", updateIsSmallDevice);
+  }, []);
+
+  return isSmallDevice;
 }

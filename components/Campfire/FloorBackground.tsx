@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState } from "react";
-import { useIsSmallDevice } from "@/hooks/useWindowDimensions";
 
 const baseFloor = [
   '\' -.  ""--.....______......-------_________.....-------_________.....----',
@@ -15,7 +14,6 @@ const baseFloor = [
 function FloorBackground() {
   const [floor, setFloor] = useState<string[]>([]);
   const containerRef = useRef<HTMLDivElement>(null);
-  const isSmallDevice = useIsSmallDevice();
 
   useEffect(() => {
     const calculateFloor = () => {
