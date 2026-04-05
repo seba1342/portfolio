@@ -58,10 +58,24 @@ export default function FlightTracker() {
       </div>
       <div className="h-[165vh]">
         <div
-          className="sticky top-[calc(50vh-40px)] z-10 flex justify-center"
+          className="sticky top-[calc(50vh-40px)] z-10 flex flex-col items-center gap-2"
           ref={titleRef}
         >
           <Titles.H1 spacing="mb-0 text-center">Flight Tracker</Titles.H1>
+          <button
+            className="cursor-pointer rounded-full bg-oatmeal/30 px-4 py-1 backdrop-blur-md"
+            onClick={() =>
+              contentRef.current?.scrollIntoView({
+                behavior: "smooth",
+                block: "center",
+              })
+            }
+            style={{ opacity: Math.max(0, 0.8 - scrollProgress * 8) }}
+          >
+            <Mono.Default className="opacity-80 transition-opacity duration-300">
+              <ScrambleOnHover>Scroll Down ↓</ScrambleOnHover>
+            </Mono.Default>
+          </button>
         </div>
       </div>
       <div ref={contentRef} />
@@ -144,9 +158,7 @@ export default function FlightTracker() {
         <MediaBlock reverse>
           <MediaBlock.Media>
             <video
-              autoPlay
               controls
-              loop
               muted
               playsInline
               src="/videos/flight-tracker-hardware.mp4"
@@ -172,6 +184,9 @@ export default function FlightTracker() {
             </Body.Default>
           </MediaBlock.Content>
         </MediaBlock>
+        <Mono.Default className="w-full text-center pt-6 md:pt-24">
+          {">< >< >< >< >< >< >< >< ><"}
+        </Mono.Default>
       </Content>
     </>
   );

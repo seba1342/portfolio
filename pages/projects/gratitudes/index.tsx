@@ -31,18 +31,18 @@ export default function Gratitudes() {
           A daily journalling app.
         </Body.Default>
         <div className="flex flex-col sm:flex-row gap-4 mt-4 pb-16">
-          <Button
+          <Button.Light
             backgroundColor={theme.alternateBackgroundColor}
             href="https://apps.apple.com/au/app/gratitudes/id6444113905"
           >
             iOS Download
-          </Button>
-          <Button
+          </Button.Light>
+          <Button.Light
             backgroundColor={theme.alternateBackgroundColor}
             href="https://play.google.com/store/apps/details?id=com.bailouni.gratitudes"
           >
             Android Download
-          </Button>
+          </Button.Light>
         </div>
 
         <div className="flex flex-row gap-1 sm:gap-12 items-center justify-center w-full">

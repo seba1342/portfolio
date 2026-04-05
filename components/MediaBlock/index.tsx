@@ -17,7 +17,11 @@ function MediaBlock({
 }
 
 function Media({ children }: { children: React.ReactNode }) {
-  return <div className="w-full md:w-1/2 md:max-h-[66vh] rounded-lg overflow-hidden">{children}</div>;
+  return (
+    <div className="w-full md:w-1/2 max-h-[66vh] rounded-lg overflow-hidden">
+      {children}
+    </div>
+  );
 }
 
 function Content({ children }: { children: React.ReactNode }) {

@@ -1,9 +1,15 @@
+import { useImperativeHandle } from "react";
 import { useScramble } from "use-scramble";
 import { useIsSmallDevice } from "@/hooks/useWindowDimensions";
 
-type Props = Readonly<{ children: string }>;
+export type ScrambleHandle = { replay: () => void };
 
-export default function ScrambleOnHover({ children }: Props) {
+type Props = Readonly<{
+  children: string;
+  handleRef?: React.Ref<ScrambleHandle>;
+}>;
+
+export default function ScrambleOnHover({ children, handleRef }: Props) {
   const { ref, replay } = useScramble({
     playOnMount: false,
     scramble: 5,
@@ -11,6 +17,8 @@ export default function ScrambleOnHover({ children }: Props) {
     text: children,
   });
   const isSmallDevice = useIsSmallDevice();
+
+  useImperativeHandle(handleRef, () => ({ replay }), [replay]);
 
   return <span onMouseOver={isSmallDevice ? undefined : replay} ref={ref} />;
 }

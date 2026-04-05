@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Mono } from "@/components/text";
+import Button from "@/components/Button";
 
 const SCREEN_WIDTH = 16;
 
@@ -225,8 +225,8 @@ export default function LcdDisplay() {
   }
 
   return (
-    <div className="flex flex-col items-center gap-4 my-12">
-      <div className="relative rounded-md bg-[#2d6b3a] p-4 pt-6 pb-4">
+    <div className="flex flex-col items-center gap-4 my-12 w-full max-w-lg mx-auto">
+      <div className="relative rounded-md bg-[#2d6b3a] p-4 pt-6 pb-4 w-full">
         {/* PCB screw holes */}
         <div className="absolute top-2 left-2 w-2.5 h-2.5 rounded-full bg-[#1a4a25] border border-[#3a8a4a]" />
         <div className="absolute top-2 right-2 w-2.5 h-2.5 rounded-full bg-[#1a4a25] border border-[#3a8a4a]" />
@@ -247,18 +247,9 @@ export default function LcdDisplay() {
         </div>
       </div>
 
-      <button
-        className={`flex items-center justify-center py-4 px-2 rounded-lg min-w-[180px] bg-bark ${
-          canPress ? "cursor-pointer opacity-100" : "cursor-default opacity-50"
-        }`}
-        disabled={!canPress}
-        onClick={handlePress}
-        type="button"
-      >
-        <Mono.Default color="light">
-          {canPress ? "Scan the Skies" : "Scanning..."}
-        </Mono.Default>
-      </button>
+      <Button.Dark disabled={!canPress} onClick={handlePress}>
+        {canPress ? "Scan the Skies" : "Scanning..."}
+      </Button.Dark>
     </div>
   );
 }
@@ -268,7 +259,7 @@ function Text({ children }: { children: string }) {
     <div className="flex gap-[2px] select-none">
       {children.split("").map((char, i) => (
         <span
-          className="uppercase font-mono text-[20px] leading-none text-[#c8d8e8] [text-shadow:0_0_6px_#8899aa66] bg-[#1f3d5a] rounded-[2px] inline-flex items-center justify-center min-w-[18px] sm:min-w-[24px] h-[30px] sm:h-[34px] overflow-visible"
+          className="uppercase font-mono text-[clamp(12px,3.2vw,20px)] leading-none text-[#c8d8e8] [text-shadow:0_0_6px_#8899aa66] bg-[#1f3d5a] rounded-[2px] inline-flex items-center justify-center flex-1 aspect-[3/4] overflow-visible"
           key={i}
         >
           {char}
