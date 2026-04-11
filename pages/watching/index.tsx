@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import Content from "@/components/Layout/Content";
@@ -80,6 +80,28 @@ export default function Watching({
   entries,
 }: InferGetStaticPropsType<typeof getStaticProps>) {
   const [selectedRating, setSelectedRating] = useState<null | number>(null);
+  const chartRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (selectedRating == null) return;
+
+    const handlePointerDown = (event: PointerEvent) => {
+      const target = event.target;
+      if (!(target instanceof Element)) return;
+      if (chartRef.current?.contains(target)) return;
+      if (
+        target.closest(
+          'a, button, input, select, textarea, summary, [role="button"]',
+        )
+      ) {
+        return;
+      }
+      setSelectedRating(null);
+    };
+
+    document.addEventListener("pointerdown", handlePointerDown);
+    return () => document.removeEventListener("pointerdown", handlePointerDown);
+  }, [selectedRating]);
 
   const distribution: Record<number, number> = {};
   for (const entry of entries) {
@@ -96,7 +118,7 @@ export default function Watching({
 
   return (
     <Content className="flex flex-col gap-4 items-center">
-      <div className="flex flex-col items-center gap-4">
+      <div className="flex flex-col items-center gap-4" ref={chartRef}>
         <RatingChart
           distribution={distribution}
           onSelectRating={setSelectedRating}

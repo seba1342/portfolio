@@ -10,7 +10,7 @@ type TextProps = {
 
 function textClassFactory(
   className: string,
-  props: Omit<TextProps, "children">
+  props: Omit<TextProps, "children">,
 ) {
   const internalColor = props.color ?? "dark";
   const internalSpacing = props.spacing ?? "mb-4 md:mb-6";

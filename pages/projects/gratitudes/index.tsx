@@ -12,7 +12,6 @@ export const theme = {
   backgroundColor: "#311730",
 };
 
-
 export default function Gratitudes() {
   return (
     <>
@@ -21,7 +20,8 @@ export default function Gratitudes() {
       >
         <FixedBanner backgroundColor={theme.backgroundColor}>
           <FixedBanner.Text>
-            Released: 20.10.23 • Platform: iOS & Android • Tech: React Native/Expo
+            Released: 20.10.23 • Platform: iOS & Android • Tech: React
+            Native/Expo
           </FixedBanner.Text>
         </FixedBanner>
         <Titles.H1 align="center" color="light">
@@ -31,30 +31,32 @@ export default function Gratitudes() {
           A daily journalling app.
         </Body.Default>
         <div className="flex flex-col sm:flex-row gap-4 mt-4 pb-16">
-          <Button
+          <Button.Light
             backgroundColor={theme.alternateBackgroundColor}
             href="https://apps.apple.com/au/app/gratitudes/id6444113905"
           >
             iOS Download
-          </Button>
-          <Button
+          </Button.Light>
+          <Button.Light
             backgroundColor={theme.alternateBackgroundColor}
             href="https://play.google.com/store/apps/details?id=com.bailouni.gratitudes"
           >
             Android Download
-          </Button>
+          </Button.Light>
         </div>
 
         <div className="flex flex-row gap-1 sm:gap-12 items-center justify-center w-full">
           <Image
             alt="Gratitudes home page"
             className="w-[45%] max-w-[300px]"
+            loading="eager"
             priority
             src={gratitudesHomeImage}
           />
           <Image
             alt="Gratitudes entry page"
             className="w-[45%] max-w-[300px]"
+            loading="eager"
             priority
             src={gratitudesEntryImage}
           />

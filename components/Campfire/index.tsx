@@ -64,12 +64,11 @@ function Campfire({ is404 = false }: { is404?: boolean }): JSX.Element {
   const [fire, setFire] = useState<string[][]>([]);
   const animationFrameRef = useRef<number>(0);
   const [rows, setRows] = useState(0);
-  const [data, setData] = useState<number[]>([]);
+  const dataRef = useRef<number[]>([]);
   const containerRef = useRef<HTMLDivElement>(null);
   const [isMouseDown, setIsMouseDown] = useState(false);
   const [isInViewport, setIsInViewport] = useState(false);
-
-  const noise = generateFireNoise();
+  const noiseRef = useRef(generateFireNoise());
 
   /** Add intersection observer to detect if the Campfire is in viewport */
   useEffect(() => {
@@ -102,15 +101,12 @@ function Campfire({ is404 = false }: { is404?: boolean }): JSX.Element {
   useEffect(() => {
     const resizeObserver = new ResizeObserver(() => {
       if (containerRef.current) {
-        const width = containerRef.current.offsetWidth;
         const height = containerRef.current.offsetHeight;
-        const newCols = Math.floor(width / (FONT_SIZE * CHAR_HEIGHT));
-
         const newRows =
           Math.floor(height / (FONT_SIZE * LINE_HEIGHT)) - logs.length;
 
         setRows(newRows);
-        setData(new Array(newCols * newRows).fill(0));
+        dataRef.current = new Array(COLS * newRows).fill(0);
       }
     });
 
@@ -122,16 +118,23 @@ function Campfire({ is404 = false }: { is404?: boolean }): JSX.Element {
   }, []);
 
   useEffect(() => {
-    if (!isInViewport) return;
+    if (!isInViewport || rows <= 0) return;
 
     let frameCount = 0;
     const targetFps = 12;
     // Assuming 60fps browser refresh rate
     const frameInterval = Math.floor(60 / targetFps);
+    const noise = noiseRef.current;
 
     const animate = () => {
       frameCount = (frameCount + 1) % frameInterval;
       if (frameCount !== 0) {
+        animationFrameRef.current = requestAnimationFrame(animate);
+        return;
+      }
+
+      const data = dataRef.current;
+      if (data.length === 0) {
         animationFrameRef.current = requestAnimationFrame(animate);
         return;
       }
@@ -185,7 +188,7 @@ function Campfire({ is404 = false }: { is404?: boolean }): JSX.Element {
         cancelAnimationFrame(animationFrameRef.current);
       }
     };
-  }, [rows, data, isMouseDown, noise, isInViewport]);
+  }, [rows, isMouseDown, isInViewport]);
 
   const handleMouseDown = (e: React.MouseEvent) => {
     setIsMouseDown(true);

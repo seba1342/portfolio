@@ -13,21 +13,40 @@ function Projects({ children }: { children: React.ReactNode }) {
 
 function Project({
   backgroundClass,
+  children,
   href,
   image,
   subtitle,
   title,
 }: {
   backgroundClass?: string;
+  children?: React.ReactNode;
   href: string;
-  image: StaticImageData;
-  subtitle: string;
+  image?: StaticImageData;
+  subtitle?: string;
   title: string;
 }) {
+  if (children) {
+    return (
+      <ScaleOnHover>
+        <Link
+          className={`group rounded-2xl overflow-hidden relative flex items-center justify-center h-full min-h-[200px] ${backgroundClass ?? ""}`}
+          href={href}
+        >
+          {children}
+          <div className="absolute bottom-0 left-0 p-6 z-10">
+            <Titles.H3 spacing="mb-0 md:mb-2">{title}</Titles.H3>
+            {subtitle && <Body.Small>{subtitle}</Body.Small>}
+          </div>
+        </Link>
+      </ScaleOnHover>
+    );
+  }
+
   return (
     <ScaleOnHover>
       <Link
-        className={`group p-6 rounded-2xl flex justify-center ${
+        className={`group p-6 rounded-2xl flex justify-center h-full ${
           backgroundClass ?? ""
         }`}
         href={href}
@@ -38,12 +57,14 @@ function Project({
           </Titles.H3>
           <Body.Small color="light">{subtitle}</Body.Small>
         </div>
-        <Image
-          alt={`${title} - ${subtitle}`}
-          className="w-1/3"
-          priority
-          src={image}
-        />
+        {image && (
+          <Image
+            alt={`${title} - ${subtitle}`}
+            className="w-1/3"
+            priority
+            src={image}
+          />
+        )}
       </Link>
     </ScaleOnHover>
   );

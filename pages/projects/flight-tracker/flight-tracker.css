@@ -1,0 +1,8 @@
+.flightTracker__background {
+  background: radial-gradient(
+    77.37% 50% at 50% 100%,
+    #f4d6b0 0%,
+    #c9a87a 72.87%,
+    #341109 100%
+  );
+}
