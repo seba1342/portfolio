@@ -15,6 +15,7 @@ const VolumetricClouds = dynamic(
 export default function FlightTracker() {
   const [scrollProgress, setScrollProgress] = useState(0);
   const [fadeProgress, setFadeProgress] = useState(0);
+  const [shaderHeight, setShaderHeight] = useState<number>();
   const contentRef = useRef<HTMLDivElement>(null);
   const titleRef = useRef<HTMLDivElement>(null);
 
@@ -74,9 +75,28 @@ export default function FlightTracker() {
     };
   }, []);
 
+  useEffect(() => {
+    const updateShaderHeight = () => {
+      setShaderHeight(
+        window.matchMedia("(pointer: coarse)").matches
+          ? window.screen.height
+          : undefined,
+      );
+    };
+
+    updateShaderHeight();
+    window.addEventListener("orientationchange", updateShaderHeight);
+    return () => {
+      window.removeEventListener("orientationchange", updateShaderHeight);
+    };
+  }, []);
+
   return (
     <>
-      <div className="fixed inset-x-0 top-0 h-[100lvh] -z-10">
+      <div
+        className="fixed inset-x-0 top-0 h-[100lvh] -z-10"
+        style={{ height: shaderHeight }}
+      >
         <VolumetricClouds
           className="w-full h-full"
           fadeProgress={fadeProgress}
