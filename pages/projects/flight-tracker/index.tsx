@@ -76,7 +76,7 @@ export default function FlightTracker() {
 
   return (
     <>
-      <div className="fixed inset-0 -z-10">
+      <div className="fixed inset-x-0 top-0 h-[100lvh] -z-10">
         <VolumetricClouds
           className="w-full h-full"
           fadeProgress={fadeProgress}
