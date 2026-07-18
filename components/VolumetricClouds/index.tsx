@@ -2,6 +2,11 @@ import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import ControlPanel from "./ControlPanel";
 import { DEFAULTS } from "./controls";
+import {
+  getCloudRenderSize,
+  getFrameInterval,
+  shouldRenderShader,
+} from "./renderPolicy";
 
 const vertexShaderSource = `#version 300 es
 in vec2 a_position;
@@ -171,6 +176,7 @@ out vec4 fragColor;
 
 uniform sampler2D u_sceneTex;
 uniform vec2 u_resolution;
+uniform vec2 u_sceneResolution;
 uniform float u_cellSize;
 uniform float u_saturation;
 uniform float u_contrast;
@@ -227,7 +233,7 @@ void main() {
 
     vec2 cellCount = u_resolution / u_cellSize;
     vec2 cellCoord = floor(uv * cellCount);
-    vec2 cellUV = (cellCoord + 0.5) / cellCount;
+    vec2 cellUV = (cellCoord + 0.5) / u_sceneResolution;
 
     vec3 sceneColor = texture(u_sceneTex, cellUV).rgb;
 
@@ -350,21 +356,30 @@ function parseControls(controls: typeof DEFAULTS): ParsedControls {
 export default function VolumetricClouds({
   className,
   fadeProgress = 0,
+  maxFps,
   scrollProgress = 0,
+  showControls = true,
 }: {
   className?: string;
   fadeProgress?: number;
+  maxFps?: number;
   scrollProgress?: number;
+  showControls?: boolean;
 }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const controlsRef = useRef<ParsedControls>(parseControls(DEFAULTS));
   const scrollRef = useRef(scrollProgress);
   const fadeRef = useRef(fadeProgress);
+  const requestRenderRef = useRef<() => void>(() => undefined);
   const [controls, setControls] = useState({ ...DEFAULTS });
 
   scrollRef.current = scrollProgress;
   fadeRef.current = fadeProgress;
   controlsRef.current = parseControls(controls);
+
+  useEffect(() => {
+    if (fadeProgress < 1) requestRenderRef.current();
+  }, [fadeProgress]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -406,6 +421,10 @@ export default function VolumetricClouds({
       glyphColor: gl.getUniformLocation(glyphProgram, "u_glyphColor"),
       resolution: gl.getUniformLocation(glyphProgram, "u_resolution"),
       saturation: gl.getUniformLocation(glyphProgram, "u_saturation"),
+      sceneResolution: gl.getUniformLocation(
+        glyphProgram,
+        "u_sceneResolution",
+      ),
       sceneTex: gl.getUniformLocation(glyphProgram, "u_sceneTex"),
     };
 
@@ -487,19 +506,72 @@ export default function VolumetricClouds({
     resizeObserver.observe(canvas);
 
     let time = 0;
-    let lastTime = 0;
-    let animationFrameId: number;
+    let lastTime: null | number = null;
+    let lastFrameTime: null | number = null;
+    let animationFrameId: null | number = null;
+    let disposed = false;
+    let elementVisible = true;
+    const frameInterval = getFrameInterval(maxFps);
 
-    function render(currentTime: number) {
-      animationFrameId = requestAnimationFrame(render);
-
-      if (fadeRef.current >= 1) {
-        lastTime = currentTime;
+    function requestRender() {
+      if (
+        disposed ||
+        animationFrameId !== null ||
+        !shouldRenderShader(
+          fadeRef.current,
+          document.hidden,
+          elementVisible,
+        )
+      ) {
         return;
       }
 
+      animationFrameId = requestAnimationFrame(render);
+    }
+
+    function pauseRender() {
+      if (animationFrameId !== null) {
+        cancelAnimationFrame(animationFrameId);
+        animationFrameId = null;
+      }
+      lastTime = null;
+      lastFrameTime = null;
+    }
+
+    function render(currentTime: number) {
+      animationFrameId = null;
+
+      if (
+        !shouldRenderShader(
+          fadeRef.current,
+          document.hidden,
+          elementVisible,
+        )
+      ) {
+        lastTime = null;
+        lastFrameTime = null;
+        return;
+      }
+
+      requestRender();
+
+      if (
+        frameInterval > 0 &&
+        lastFrameTime !== null &&
+        currentTime - lastFrameTime < frameInterval
+      ) {
+        return;
+      }
+
+      if (frameInterval > 0 && lastFrameTime !== null) {
+        const elapsed = currentTime - lastFrameTime;
+        lastFrameTime = currentTime - (elapsed % frameInterval);
+      } else {
+        lastFrameTime = currentTime;
+      }
+
       const c = controlsRef.current;
-      const deltaTime = (currentTime - lastTime) / 1000;
+      const deltaTime = lastTime === null ? 0 : (currentTime - lastTime) / 1000;
       lastTime = currentTime;
       time += deltaTime * c.timeSpeed;
 
@@ -507,21 +579,41 @@ export default function VolumetricClouds({
       const h = canvas!.height;
       if (w === 0 || h === 0) return;
       const sp = scrollRef.current;
+      const pixelRatio = window.devicePixelRatio || 1;
+      const cloudRenderSize = getCloudRenderSize({
+        asciiEnabled: c.asciiEnabled,
+        canvasHeight: h,
+        canvasWidth: w,
+        cellSize: c.cellSize,
+        pixelRatio,
+      });
 
       gl!.bindVertexArray(quadVAO);
 
       if (c.asciiEnabled) {
-        ensureFBO(w, h);
+        ensureFBO(
+          cloudRenderSize.framebufferWidth,
+          cloudRenderSize.framebufferHeight,
+        );
         gl!.bindFramebuffer(gl!.FRAMEBUFFER, fbo);
       } else {
         gl!.bindFramebuffer(gl!.FRAMEBUFFER, null);
       }
 
       // Pass 1: volumetric clouds
-      gl!.viewport(0, 0, w, h);
+      gl!.viewport(
+        0,
+        0,
+        cloudRenderSize.framebufferWidth,
+        cloudRenderSize.framebufferHeight,
+      );
       gl!.useProgram(cloudsProgram);
       gl!.uniform1f(cloudsU.time, time);
-      gl!.uniform2f(cloudsU.resolution, w, h);
+      gl!.uniform2f(
+        cloudsU.resolution,
+        cloudRenderSize.resolutionWidth,
+        cloudRenderSize.resolutionHeight,
+      );
       gl!.uniform1f(cloudsU.coverage, c.coverage);
       gl!.uniform1f(cloudsU.cloudHeight, c.cloudHeight + sp * 0.5);
       gl!.uniform1f(cloudsU.camElevation, c.camElevation + sp * 0.2);
@@ -580,10 +672,12 @@ export default function VolumetricClouds({
         gl!.bindTexture(gl!.TEXTURE_2D, sceneTex);
         gl!.uniform1i(glyphU.sceneTex, 0);
         gl!.uniform2f(glyphU.resolution, w, h);
-        gl!.uniform1f(
-          glyphU.cellSize,
-          c.cellSize * (window.devicePixelRatio || 1),
+        gl!.uniform2f(
+          glyphU.sceneResolution,
+          cloudRenderSize.framebufferWidth,
+          cloudRenderSize.framebufferHeight,
         );
+        gl!.uniform1f(glyphU.cellSize, c.cellSize * pixelRatio);
         gl!.uniform1f(glyphU.saturation, c.saturation);
         gl!.uniform1f(glyphU.contrast, c.contrast);
         gl!.uniform1f(glyphU.brightness, c.brightness);
@@ -604,14 +698,32 @@ export default function VolumetricClouds({
       }
     }
 
-    animationFrameId = requestAnimationFrame(render);
+    requestRenderRef.current = requestRender;
+    requestRender();
+
+    const visibilityObserver = new IntersectionObserver(([entry]) => {
+      elementVisible = entry?.isIntersecting ?? false;
+      if (elementVisible) requestRender();
+      else pauseRender();
+    });
+    visibilityObserver.observe(canvas);
+
+    const onVisibilityChange = () => {
+      if (document.hidden) pauseRender();
+      else requestRender();
+    };
+    document.addEventListener("visibilitychange", onVisibilityChange);
 
     const onResize = () => updateCanvasSize();
     window.addEventListener("resize", onResize);
 
     return () => {
-      cancelAnimationFrame(animationFrameId);
+      disposed = true;
+      requestRenderRef.current = () => undefined;
+      pauseRender();
+      visibilityObserver.disconnect();
       resizeObserver.disconnect();
+      document.removeEventListener("visibilitychange", onVisibilityChange);
       window.removeEventListener("resize", onResize);
       gl.deleteProgram(cloudsProgram);
       gl.deleteProgram(glyphProgram);
@@ -621,7 +733,7 @@ export default function VolumetricClouds({
       if (fbo) gl.deleteFramebuffer(fbo);
       if (sceneTex) gl.deleteTexture(sceneTex);
     };
-  }, []);
+  }, [maxFps]);
 
   return (
     <div className={className}>
@@ -634,7 +746,8 @@ export default function VolumetricClouds({
           width: "100%",
         }}
       />
-      {process.env.NODE_ENV === "development" &&
+      {showControls &&
+        process.env.NODE_ENV === "development" &&
         typeof document !== "undefined" &&
         createPortal(
           <ControlPanel controls={controls} onChange={setControls} />,

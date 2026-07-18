@@ -1,10 +1,14 @@
-import Image from "next/image";
+import dynamic from "next/dynamic";
 import Content from "@/components/Layout/Content";
 import Projects from "@/components/Projects";
 import ScrambleOnHover from "@/components/ScrambleOnHover";
 import { Body, Titles } from "@/components/text";
-import flightTrackerHero from "./projects/flight-tracker/assets/flight-tracker-hero.png";
 import gratitudesImage from "./projects/gratitudes/assets/gratitudes.png";
+
+const VolumetricClouds = dynamic(
+  () => import("@/components/VolumetricClouds"),
+  { ssr: false },
+);
 
 export default function Home() {
   return (
@@ -40,16 +44,15 @@ export default function Home() {
       <Projects>
         <Projects.Project
           href="/projects/flight-tracker"
-          subtitle="Your eyes in the sky."
           title="Flight Tracker"
         >
-          <Image
-            alt="Flight Tracker — ASCII volumetric clouds"
-            className="absolute inset-0 w-full h-full object-cover opacity-60"
-            fill
-            src={flightTrackerHero}
+          <VolumetricClouds
+            className="absolute inset-0 h-full w-full"
+            maxFps={24}
+            showControls={false}
           />
-          <div className="absolute inset-0 border-2 border-bark rounded-2xl z-10 pointer-events-none" />
+          <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-oatmeal to-oatmeal/0 pointer-events-none" />
+          <div className="absolute inset-0 border border-bark rounded-2xl z-10 pointer-events-none" />
         </Projects.Project>
         <Projects.Project
           backgroundClass="gratitudes__background"
