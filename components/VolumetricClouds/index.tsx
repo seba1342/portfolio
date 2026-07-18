@@ -498,8 +498,8 @@ export default function VolumetricClouds({
     resizeObserver.observe(canvas);
 
     let time = 0;
-    let lastTime: number | null = null;
-    let animationFrameId: number | null = null;
+    let lastTime: null | number = null;
+    let animationFrameId: null | number = null;
     let disposed = false;
 
     function requestRender() {
