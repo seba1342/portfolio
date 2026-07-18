@@ -17,3 +17,15 @@ test("uses the live cloud shader for the Flight Tracker home card", () => {
   assert.match(source, /showControls=\{false\}/);
   assert.doesNotMatch(source, /flightTrackerHero/);
 });
+
+test("keeps the Flight Tracker title readable over the shader", () => {
+  const source = readFileSync(resolve("pages/index.tsx"), "utf8");
+
+  assert.doesNotMatch(source, /subtitle="Your eyes in the sky\."/);
+  assert.match(
+    source,
+    /h-1\/3 bg-gradient-to-t from-oatmeal to-oatmeal\/0/,
+  );
+  assert.match(source, /border border-bark/);
+  assert.doesNotMatch(source, /border-2 border-bark/);
+});

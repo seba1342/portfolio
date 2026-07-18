@@ -44,7 +44,6 @@ export default function Home() {
       <Projects>
         <Projects.Project
           href="/projects/flight-tracker"
-          subtitle="Your eyes in the sky."
           title="Flight Tracker"
         >
           <VolumetricClouds
@@ -52,7 +51,8 @@ export default function Home() {
             maxFps={24}
             showControls={false}
           />
-          <div className="absolute inset-0 border-2 border-bark rounded-2xl z-10 pointer-events-none" />
+          <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-oatmeal to-oatmeal/0 pointer-events-none" />
+          <div className="absolute inset-0 border border-bark rounded-2xl z-10 pointer-events-none" />
         </Projects.Project>
         <Projects.Project
           backgroundClass="gratitudes__background"
