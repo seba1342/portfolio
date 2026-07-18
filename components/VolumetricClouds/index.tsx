@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import ControlPanel from "./ControlPanel";
 import { DEFAULTS } from "./controls";
+import { getCloudRenderSize } from "./renderPolicy";
 
 const vertexShaderSource = `#version 300 es
 in vec2 a_position;
@@ -171,6 +172,7 @@ out vec4 fragColor;
 
 uniform sampler2D u_sceneTex;
 uniform vec2 u_resolution;
+uniform vec2 u_sceneResolution;
 uniform float u_cellSize;
 uniform float u_saturation;
 uniform float u_contrast;
@@ -227,7 +229,7 @@ void main() {
 
     vec2 cellCount = u_resolution / u_cellSize;
     vec2 cellCoord = floor(uv * cellCount);
-    vec2 cellUV = (cellCoord + 0.5) / cellCount;
+    vec2 cellUV = (cellCoord + 0.5) / u_sceneResolution;
 
     vec3 sceneColor = texture(u_sceneTex, cellUV).rgb;
 
@@ -406,6 +408,10 @@ export default function VolumetricClouds({
       glyphColor: gl.getUniformLocation(glyphProgram, "u_glyphColor"),
       resolution: gl.getUniformLocation(glyphProgram, "u_resolution"),
       saturation: gl.getUniformLocation(glyphProgram, "u_saturation"),
+      sceneResolution: gl.getUniformLocation(
+        glyphProgram,
+        "u_sceneResolution",
+      ),
       sceneTex: gl.getUniformLocation(glyphProgram, "u_sceneTex"),
     };
 
@@ -507,21 +513,41 @@ export default function VolumetricClouds({
       const h = canvas!.height;
       if (w === 0 || h === 0) return;
       const sp = scrollRef.current;
+      const pixelRatio = window.devicePixelRatio || 1;
+      const cloudRenderSize = getCloudRenderSize({
+        asciiEnabled: c.asciiEnabled,
+        canvasHeight: h,
+        canvasWidth: w,
+        cellSize: c.cellSize,
+        pixelRatio,
+      });
 
       gl!.bindVertexArray(quadVAO);
 
       if (c.asciiEnabled) {
-        ensureFBO(w, h);
+        ensureFBO(
+          cloudRenderSize.framebufferWidth,
+          cloudRenderSize.framebufferHeight,
+        );
         gl!.bindFramebuffer(gl!.FRAMEBUFFER, fbo);
       } else {
         gl!.bindFramebuffer(gl!.FRAMEBUFFER, null);
       }
 
       // Pass 1: volumetric clouds
-      gl!.viewport(0, 0, w, h);
+      gl!.viewport(
+        0,
+        0,
+        cloudRenderSize.framebufferWidth,
+        cloudRenderSize.framebufferHeight,
+      );
       gl!.useProgram(cloudsProgram);
       gl!.uniform1f(cloudsU.time, time);
-      gl!.uniform2f(cloudsU.resolution, w, h);
+      gl!.uniform2f(
+        cloudsU.resolution,
+        cloudRenderSize.resolutionWidth,
+        cloudRenderSize.resolutionHeight,
+      );
       gl!.uniform1f(cloudsU.coverage, c.coverage);
       gl!.uniform1f(cloudsU.cloudHeight, c.cloudHeight + sp * 0.5);
       gl!.uniform1f(cloudsU.camElevation, c.camElevation + sp * 0.2);
@@ -580,10 +606,12 @@ export default function VolumetricClouds({
         gl!.bindTexture(gl!.TEXTURE_2D, sceneTex);
         gl!.uniform1i(glyphU.sceneTex, 0);
         gl!.uniform2f(glyphU.resolution, w, h);
-        gl!.uniform1f(
-          glyphU.cellSize,
-          c.cellSize * (window.devicePixelRatio || 1),
+        gl!.uniform2f(
+          glyphU.sceneResolution,
+          cloudRenderSize.framebufferWidth,
+          cloudRenderSize.framebufferHeight,
         );
+        gl!.uniform1f(glyphU.cellSize, c.cellSize * pixelRatio);
         gl!.uniform1f(glyphU.saturation, c.saturation);
         gl!.uniform1f(glyphU.contrast, c.contrast);
         gl!.uniform1f(glyphU.brightness, c.brightness);
