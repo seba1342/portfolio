@@ -40,3 +40,10 @@ export function getCloudRenderSize({
     resolutionWidth,
   };
 }
+
+export function shouldRenderShader(
+  fadeProgress: number,
+  documentHidden: boolean,
+): boolean {
+  return fadeProgress < 1 && !documentHidden;
+}

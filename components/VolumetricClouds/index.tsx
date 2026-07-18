@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import ControlPanel from "./ControlPanel";
 import { DEFAULTS } from "./controls";
-import { getCloudRenderSize } from "./renderPolicy";
+import { getCloudRenderSize, shouldRenderShader } from "./renderPolicy";
 
 const vertexShaderSource = `#version 300 es
 in vec2 a_position;
@@ -362,11 +362,16 @@ export default function VolumetricClouds({
   const controlsRef = useRef<ParsedControls>(parseControls(DEFAULTS));
   const scrollRef = useRef(scrollProgress);
   const fadeRef = useRef(fadeProgress);
+  const requestRenderRef = useRef<() => void>(() => undefined);
   const [controls, setControls] = useState({ ...DEFAULTS });
 
   scrollRef.current = scrollProgress;
   fadeRef.current = fadeProgress;
   controlsRef.current = parseControls(controls);
+
+  useEffect(() => {
+    if (fadeProgress < 1) requestRenderRef.current();
+  }, [fadeProgress]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -493,19 +498,42 @@ export default function VolumetricClouds({
     resizeObserver.observe(canvas);
 
     let time = 0;
-    let lastTime = 0;
-    let animationFrameId: number;
+    let lastTime: number | null = null;
+    let animationFrameId: number | null = null;
+    let disposed = false;
 
-    function render(currentTime: number) {
-      animationFrameId = requestAnimationFrame(render);
-
-      if (fadeRef.current >= 1) {
-        lastTime = currentTime;
+    function requestRender() {
+      if (
+        disposed ||
+        animationFrameId !== null ||
+        !shouldRenderShader(fadeRef.current, document.hidden)
+      ) {
         return;
       }
 
+      animationFrameId = requestAnimationFrame(render);
+    }
+
+    function pauseRender() {
+      if (animationFrameId !== null) {
+        cancelAnimationFrame(animationFrameId);
+        animationFrameId = null;
+      }
+      lastTime = null;
+    }
+
+    function render(currentTime: number) {
+      animationFrameId = null;
+
+      if (!shouldRenderShader(fadeRef.current, document.hidden)) {
+        lastTime = null;
+        return;
+      }
+
+      requestRender();
+
       const c = controlsRef.current;
-      const deltaTime = (currentTime - lastTime) / 1000;
+      const deltaTime = lastTime === null ? 0 : (currentTime - lastTime) / 1000;
       lastTime = currentTime;
       time += deltaTime * c.timeSpeed;
 
@@ -632,14 +660,24 @@ export default function VolumetricClouds({
       }
     }
 
-    animationFrameId = requestAnimationFrame(render);
+    requestRenderRef.current = requestRender;
+    requestRender();
+
+    const onVisibilityChange = () => {
+      if (document.hidden) pauseRender();
+      else requestRender();
+    };
+    document.addEventListener("visibilitychange", onVisibilityChange);
 
     const onResize = () => updateCanvasSize();
     window.addEventListener("resize", onResize);
 
     return () => {
-      cancelAnimationFrame(animationFrameId);
+      disposed = true;
+      requestRenderRef.current = () => undefined;
+      pauseRender();
       resizeObserver.disconnect();
+      document.removeEventListener("visibilitychange", onVisibilityChange);
       window.removeEventListener("resize", onResize);
       gl.deleteProgram(cloudsProgram);
       gl.deleteProgram(glyphProgram);

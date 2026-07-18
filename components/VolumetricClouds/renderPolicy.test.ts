@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { getCloudRenderSize } from "./renderPolicy";
+import { getCloudRenderSize, shouldRenderShader } from "./renderPolicy";
 
 test("sizes the cloud framebuffer to the physical ASCII grid", () => {
   assert.deepEqual(
@@ -36,4 +36,10 @@ test("uses canvas resolution when ASCII is disabled", () => {
       resolutionWidth: 1440,
     },
   );
+});
+
+test("renders only while the shader and document are visible", () => {
+  assert.equal(shouldRenderShader(0.99, false), true);
+  assert.equal(shouldRenderShader(1, false), false);
+  assert.equal(shouldRenderShader(0, true), false);
 });
