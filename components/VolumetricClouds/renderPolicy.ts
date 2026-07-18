@@ -13,6 +13,10 @@ export interface CloudRenderSize {
   resolutionWidth: number;
 }
 
+export function getFrameInterval(maxFps?: number): number {
+  return maxFps && maxFps > 0 ? 1000 / maxFps : 0;
+}
+
 export function getCloudRenderSize({
   asciiEnabled,
   canvasHeight,
@@ -44,6 +48,7 @@ export function getCloudRenderSize({
 export function shouldRenderShader(
   fadeProgress: number,
   documentHidden: boolean,
+  elementVisible = true,
 ): boolean {
-  return fadeProgress < 1 && !documentHidden;
+  return fadeProgress < 1 && !documentHidden && elementVisible;
 }

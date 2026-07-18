@@ -2,7 +2,11 @@ import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import ControlPanel from "./ControlPanel";
 import { DEFAULTS } from "./controls";
-import { getCloudRenderSize, shouldRenderShader } from "./renderPolicy";
+import {
+  getCloudRenderSize,
+  getFrameInterval,
+  shouldRenderShader,
+} from "./renderPolicy";
 
 const vertexShaderSource = `#version 300 es
 in vec2 a_position;
@@ -352,11 +356,15 @@ function parseControls(controls: typeof DEFAULTS): ParsedControls {
 export default function VolumetricClouds({
   className,
   fadeProgress = 0,
+  maxFps,
   scrollProgress = 0,
+  showControls = true,
 }: {
   className?: string;
   fadeProgress?: number;
+  maxFps?: number;
   scrollProgress?: number;
+  showControls?: boolean;
 }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const controlsRef = useRef<ParsedControls>(parseControls(DEFAULTS));
@@ -499,14 +507,21 @@ export default function VolumetricClouds({
 
     let time = 0;
     let lastTime: null | number = null;
+    let lastFrameTime: null | number = null;
     let animationFrameId: null | number = null;
     let disposed = false;
+    let elementVisible = true;
+    const frameInterval = getFrameInterval(maxFps);
 
     function requestRender() {
       if (
         disposed ||
         animationFrameId !== null ||
-        !shouldRenderShader(fadeRef.current, document.hidden)
+        !shouldRenderShader(
+          fadeRef.current,
+          document.hidden,
+          elementVisible,
+        )
       ) {
         return;
       }
@@ -520,17 +535,40 @@ export default function VolumetricClouds({
         animationFrameId = null;
       }
       lastTime = null;
+      lastFrameTime = null;
     }
 
     function render(currentTime: number) {
       animationFrameId = null;
 
-      if (!shouldRenderShader(fadeRef.current, document.hidden)) {
+      if (
+        !shouldRenderShader(
+          fadeRef.current,
+          document.hidden,
+          elementVisible,
+        )
+      ) {
         lastTime = null;
+        lastFrameTime = null;
         return;
       }
 
       requestRender();
+
+      if (
+        frameInterval > 0 &&
+        lastFrameTime !== null &&
+        currentTime - lastFrameTime < frameInterval
+      ) {
+        return;
+      }
+
+      if (frameInterval > 0 && lastFrameTime !== null) {
+        const elapsed = currentTime - lastFrameTime;
+        lastFrameTime = currentTime - (elapsed % frameInterval);
+      } else {
+        lastFrameTime = currentTime;
+      }
 
       const c = controlsRef.current;
       const deltaTime = lastTime === null ? 0 : (currentTime - lastTime) / 1000;
@@ -663,6 +701,13 @@ export default function VolumetricClouds({
     requestRenderRef.current = requestRender;
     requestRender();
 
+    const visibilityObserver = new IntersectionObserver(([entry]) => {
+      elementVisible = entry?.isIntersecting ?? false;
+      if (elementVisible) requestRender();
+      else pauseRender();
+    });
+    visibilityObserver.observe(canvas);
+
     const onVisibilityChange = () => {
       if (document.hidden) pauseRender();
       else requestRender();
@@ -676,6 +721,7 @@ export default function VolumetricClouds({
       disposed = true;
       requestRenderRef.current = () => undefined;
       pauseRender();
+      visibilityObserver.disconnect();
       resizeObserver.disconnect();
       document.removeEventListener("visibilitychange", onVisibilityChange);
       window.removeEventListener("resize", onResize);
@@ -687,7 +733,7 @@ export default function VolumetricClouds({
       if (fbo) gl.deleteFramebuffer(fbo);
       if (sceneTex) gl.deleteTexture(sceneTex);
     };
-  }, []);
+  }, [maxFps]);
 
   return (
     <div className={className}>
@@ -700,7 +746,8 @@ export default function VolumetricClouds({
           width: "100%",
         }}
       />
-      {process.env.NODE_ENV === "development" &&
+      {showControls &&
+        process.env.NODE_ENV === "development" &&
         typeof document !== "undefined" &&
         createPortal(
           <ControlPanel controls={controls} onChange={setControls} />,
